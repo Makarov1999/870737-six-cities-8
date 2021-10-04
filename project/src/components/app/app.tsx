@@ -1,15 +1,12 @@
 import React from 'react';
-import CityPlaceCard from '../../types/city-place-card';
-import Main from '../main/main';
+import { Main } from '../main';
+import {CITY_PLACES} from './app.const';
 
-type AppProps = {
-  cards: CityPlaceCard[]
-}
-function App(props: AppProps): JSX.Element {
+function App(): JSX.Element {
   return (
-    <React.StrictMode>
-      <Main cards={props.cards}/>;
-    </React.StrictMode>
+    <>
+      <Main cards={CITY_PLACES}/>;
+    </>
   );
 }
 

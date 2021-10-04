@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/app/app';
-import { CITY_PLACES } from './const';
+import { App } from './components/app';
 
-const cityPlaces = CITY_PLACES;
 ReactDOM.render(
   <React.StrictMode>
-    <App cards={cityPlaces}/>
+    <App/>
   </React.StrictMode>,
   document.getElementById('root'));

@@ -1,6 +1,6 @@
-import CityPlaceCard from './types/city-place-card';
+import { TCityPlaceCard } from '../../types';
 
-export const CITY_PLACES: CityPlaceCard[] = [
+export const CITY_PLACES: TCityPlaceCard[] = [
   {
     id: 1,
     type: 'Apartment',

@@ -1,4 +1,4 @@
-type CityPlaceCard = {
+type TCityPlaceCard = {
     id: number,
     type: string,
     title: string,
@@ -9,4 +9,4 @@ type CityPlaceCard = {
     rating: number
 };
 
-export default CityPlaceCard;
+export default TCityPlaceCard;
