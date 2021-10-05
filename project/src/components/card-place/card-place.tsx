@@ -1,4 +1,8 @@
-import { TCardPlaceProps } from './card-place.types';
+import { TCityPlaceCard } from '../../types';
+
+type TCardPlaceProps = {
+  card: TCityPlaceCard
+};
 
 function CardPlace({card}: TCardPlaceProps): JSX.Element {
   return (
