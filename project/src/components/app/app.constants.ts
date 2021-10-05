@@ -1,13 +1,13 @@
 import { TCityPlaceCard } from '../../types';
 
-export enum AppRoute {
+export enum AppRoutes {
   Main = '/',
   SignIn = '/login',
   Favorites = '/favorites',
   Room = '/offer/:id'
 }
 
-export enum AuthStatus {
+export enum AuthStatuses {
   Auth = 'AUTH',
   NoAuth = 'NO_AUTH',
   Unknown = 'UNKNOWN'

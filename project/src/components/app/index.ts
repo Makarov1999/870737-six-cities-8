@@ -1,2 +1,2 @@
 export {default as App} from './app';
-export { AuthStatus } from './app.constants';
+export { AuthStatuses, CITY_PLACES,  AppRoutes} from './app.constants';

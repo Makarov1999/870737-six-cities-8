@@ -4,28 +4,27 @@ import { Login } from '../login';
 import { Main } from '../main';
 import { NotFound } from '../not-found';
 import { Property } from '../property';
-import {CITY_PLACES, AppRoute} from './app.constants';
+import {CITY_PLACES, AppRoutes, AuthStatuses} from './app.constants';
 import { PrivateRoute } from '../private-route';
-import { AuthStatus } from '.';
 
 function App(): JSX.Element {
   return(
     <BrowserRouter>
       <Switch>
-        <Route path={AppRoute.Main} exact>
+        <Route path={AppRoutes.Main} exact>
           <Main cards={CITY_PLACES}/>
         </Route>
-        <Route path={AppRoute.SignIn} exact>
+        <Route path={AppRoutes.SignIn} exact>
           <Login/>
         </Route>
         <PrivateRoute
-          path={AppRoute.Favorites}
+          path={AppRoutes.Favorites}
           render={() => <Favorite/>}
-          athorizationStatus={AuthStatus.NoAuth}
+          athorizationStatus={AuthStatuses.NoAuth}
           exact
         >
         </PrivateRoute>
-        <Route path={AppRoute.Room} exact>
+        <Route path={AppRoutes.Room} exact>
           <Property/>
         </Route>
         <Route>
