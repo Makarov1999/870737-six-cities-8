@@ -1,6 +1,9 @@
-import { TMainProps } from './main.types';
 import { CardPlace } from '../card-place';
+import { TCityPlaceCard } from '../../types';
 
+type TMainProps = {
+  cards: TCityPlaceCard[]
+}
 function Main({cards}: TMainProps): JSX.Element {
   return (
     <>
