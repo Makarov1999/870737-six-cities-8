@@ -1,10 +1,10 @@
-import { CardPlace } from '../card-place';
+import { CardPlaceList } from '../card-place-list';
 import { TCityPlaceCard } from '../../types';
 
 type TMainProps = {
-  cards: TCityPlaceCard[]
+  offers: TCityPlaceCard[]
 }
-function Main({cards}: TMainProps): JSX.Element {
+function Main({offers}: TMainProps): JSX.Element {
   return (
     <>
       <div style={{display: 'none'}}>
@@ -96,9 +96,7 @@ function Main({cards}: TMainProps): JSX.Element {
                     <li className="places__option" tabIndex={0}>Top rated first</li>
                   </ul>
                 </form>
-                <div className="cities__places-list places__list tabs__content">
-                  {cards.map((card) => <CardPlace card={card} key={card.id}/>)}
-                </div>
+                <CardPlaceList offers={offers}/>
               </section>
               <div className="cities__right-section">
                 <section className="cities__map map"></section>
