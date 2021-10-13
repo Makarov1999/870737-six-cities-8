@@ -8,9 +8,15 @@ type TCardPlaceProps = {
 };
 
 function CardPlace({card, onPointerOverCard, onPointerLeaveCard}: TCardPlaceProps): JSX.Element {
+  const handlePointerOver = (): void => {
+    onPointerOverCard(card);
+  };
+  const handlePointerLeave = (): void => {
+    onPointerLeaveCard();
+  };
   const {id, type ,title, price, rating, isPremiun, isFavorite} = card;
   return (
-    <article className="cities__place-card place-card" onPointerOver={() => {onPointerOverCard(card);}} onPointerLeave={() => {onPointerLeaveCard();}}>
+    <article className="cities__place-card place-card" onPointerOver={handlePointerOver} onPointerLeave={handlePointerLeave}>
       {isPremiun ? <div className="place-card__mark"><span>Premium</span></div> : ''}
       <div className="cities__image-wrapper place-card__image-wrapper">
         <a href="#">
