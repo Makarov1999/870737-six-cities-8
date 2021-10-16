@@ -1,5 +1,5 @@
-import { Logo } from '../logo';
-import { CommentForm } from '../comment-form';
+import Logo from '../logo/logo';
+import CommentForm from '../comment-form/comment-form';
 
 function Property(): JSX.Element {
   return (

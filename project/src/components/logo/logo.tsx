@@ -1,4 +1,4 @@
-import { AppRoutes } from '../app';
+import { AppRoutes } from '../app/app.constants';
 import {Link} from 'react-router-dom';
 
 function Logo(): JSX.Element {

@@ -1,5 +1,5 @@
-import { TCityPlaceCard } from '../../types';
-import { Logo } from '../logo';
+import TCityPlaceCard from '../../types/city-place-card';
+import Logo from '../logo/logo';
 type TFavoriteProps = {
   cards: TCityPlaceCard[]
 
