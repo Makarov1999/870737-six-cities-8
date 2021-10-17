@@ -20,7 +20,7 @@ function Map({city, offers, activeOffer}: TMapProps): JSX.Element {
           lat: offer.location.latitude,
           lng: offer.location.longitude,
         });
-        marker.setIcon(activeOffer !== null && activeOffer.id === offer.id
+        marker.setIcon(activeOffer?.id === offer.id
           ? ACTIVE_MARKER_ICON
           : DEFAULT_MARKER_ICON)
           .addTo(map);
