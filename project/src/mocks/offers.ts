@@ -1,4 +1,4 @@
-import { TCityPlaceCard } from '../types';
+import TCityPlaceCard from '../types/city-place-card';
 
 export const OFFERS: TCityPlaceCard[] = [
   {
@@ -88,8 +88,8 @@ export const OFFERS: TCityPlaceCard[] = [
     goods: ['Heating', 'Kitchen', 'Cable TV', 'Washing machine', 'Coffee machine', 'Dishwasher', 'Wi-Fi'],
     maxAdults: 5,
     location: {
-      latitude: 52.41444,
-      longitude: 4.9071163,
+      latitude: 52.367578,
+      longitude: 4.854204,
       zoom: 11,
     },
     type: 'Apartment',

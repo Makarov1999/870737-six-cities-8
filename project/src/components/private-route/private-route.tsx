@@ -1,5 +1,5 @@
 import { Route, Redirect, RouteProps } from 'react-router-dom';
-import { AuthStatuses, AppRoutes } from '../app';
+import { AuthStatuses, AppRoutes } from '../app/app.constants';
 
 type PrivateRouteProps = RouteProps & {
     render: () => JSX.Element,

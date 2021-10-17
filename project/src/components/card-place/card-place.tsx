@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { TCityPlaceCard } from '../../types';
+import TCityPlaceCard from '../../types/city-place-card';
 
 type TCardPlaceProps = {
   card: TCityPlaceCard,

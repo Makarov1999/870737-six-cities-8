@@ -1,12 +1,9 @@
-type TLocation = {
-    latitude: number,
-    longitude: number,
-    zoom: number
-}
+import TLocation from './location';
+
 type TCity = {
     location: TLocation,
     name: string
-};
+}
 
 type THost = {
     id: number,
@@ -31,6 +28,6 @@ type TCityPlaceCard = {
     isFavorite: boolean,
     isPremiun: boolean,
     rating: number
-};
+}
 
 export default TCityPlaceCard;
