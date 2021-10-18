@@ -3,6 +3,7 @@ import TCityPlaceCard from '../../types/city-place-card';
 import { useCallback, useState } from 'react';
 import Map from '../map/map';
 import { AMSTERDAM_CITY } from './main.constants';
+import {CardPlaceListPageTypes} from '../card-place-list/card-place-list.constants';
 
 type TMainProps = {
   offers: TCityPlaceCard[]
@@ -106,7 +107,7 @@ function Main({offers}: TMainProps): JSX.Element {
                     <li className="places__option" tabIndex={0}>Top rated first</li>
                   </ul>
                 </form>
-                <CardPlaceList offers={offers} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
+                <CardPlaceList offers={offers} pageType={CardPlaceListPageTypes.Main} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
               </section>
               <div className="cities__right-section">
                 <section className="cities__map map">
