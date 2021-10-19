@@ -1,20 +1,19 @@
+import { TCardPlaceListClassNames } from '../../types/card-place-list-classnames';
 import TCityPlaceCard from '../../types/city-place-card';
 import CardPlace from '../card-place/card-place';
-import { CardPlaceListPageTypes } from './card-place-list.constants';
 
 type TCardPlaceListProps = {
     offers: TCityPlaceCard[],
-    pageType: string,
+    classNames: TCardPlaceListClassNames,
     handlePointerOver?: (offer: TCityPlaceCard) => void ,
     handlePointerLeave?: () => void
 };
-function CardPlaceList({offers, pageType, handlePointerOver, handlePointerLeave}: TCardPlaceListProps): JSX.Element {
+function CardPlaceList({offers, classNames, handlePointerOver, handlePointerLeave}: TCardPlaceListProps): JSX.Element {
   return (
-    <div className={pageType === CardPlaceListPageTypes.Main
-      ? 'cities__places-list places__list tabs__content'
-      : 'near-places__list places__list'}
-    >
-      {offers.map((offer) => <CardPlace card={offer} pageType={pageType} key={offer.id} onPointerOverCard={handlePointerOver} onPointerLeaveCard={handlePointerLeave}/>)}
+    <div className={`places__list ${classNames.list}`}>
+      {offers.map((offer) =>
+        (<CardPlace card={offer} cardClassName={classNames.card} imgWrapClassName={classNames.imgWrap} key={offer.id} onPointerOverCard={handlePointerOver} onPointerLeaveCard={handlePointerLeave}/>
+        ))}
     </div>
   );
 }

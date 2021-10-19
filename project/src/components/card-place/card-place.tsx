@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom';
 import TCityPlaceCard from '../../types/city-place-card';
-import { CardPlaceListPageTypes } from '../card-place-list/card-place-list.constants';
 type TCardPlaceProps = {
   card: TCityPlaceCard,
-  pageType: string,
+  imgWrapClassName: string,
+  cardClassName: string,
   onPointerOverCard?: (card: TCityPlaceCard) => void,
   onPointerLeaveCard?: () => void,
 };
 
-function CardPlace({card, pageType, onPointerOverCard, onPointerLeaveCard}: TCardPlaceProps): JSX.Element {
+function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, onPointerLeaveCard}: TCardPlaceProps): JSX.Element {
   const handlePointerOver = (): void => {
     onPointerOverCard?.(card);
   };
@@ -17,17 +17,12 @@ function CardPlace({card, pageType, onPointerOverCard, onPointerLeaveCard}: TCar
   };
   const {id, type ,title, price, rating, isPremiun, isFavorite} = card;
   return (
-    <article className={pageType === CardPlaceListPageTypes.Main
-      ? 'cities__place-card place-card'
-      : 'near-places__card place-card'}
-    onPointerOver={handlePointerOver}
-    onPointerLeave={handlePointerLeave}
+    <article className={`${cardClassName} place-card`}
+      onPointerOver={handlePointerOver}
+      onPointerLeave={handlePointerLeave}
     >
       {isPremiun ? <div className="place-card__mark"><span>Premium</span></div> : ''}
-      <div className={pageType === CardPlaceListPageTypes.Main
-        ? 'cities__image-wrapper place-card__image-wrapper'
-        : 'near-places__image-wrapper place-card__image-wrapper'}
-      >
+      <div className={`${imgWrapClassName} place-card__image-wrapper`}>
         <a href="#">
           <img className="place-card__image" src={card.previewImage} width="260" height="200" alt="Place image"/>
         </a>
