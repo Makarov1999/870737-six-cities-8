@@ -1,24 +1,28 @@
 import { Link } from 'react-router-dom';
 import TCityPlaceCard from '../../types/city-place-card';
-
 type TCardPlaceProps = {
   card: TCityPlaceCard,
-  onPointerOverCard: (card: TCityPlaceCard) => void,
-  onPointerLeaveCard: () => void,
+  imgWrapClassName: string,
+  cardClassName: string,
+  onPointerOverCard?: (card: TCityPlaceCard) => void,
+  onPointerLeaveCard?: () => void,
 };
 
-function CardPlace({card, onPointerOverCard, onPointerLeaveCard}: TCardPlaceProps): JSX.Element {
+function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, onPointerLeaveCard}: TCardPlaceProps): JSX.Element {
   const handlePointerOver = (): void => {
-    onPointerOverCard(card);
+    onPointerOverCard?.(card);
   };
   const handlePointerLeave = (): void => {
-    onPointerLeaveCard();
+    onPointerLeaveCard?.();
   };
   const {id, type ,title, price, rating, isPremiun, isFavorite} = card;
   return (
-    <article className="cities__place-card place-card" onPointerOver={handlePointerOver} onPointerLeave={handlePointerLeave}>
+    <article className={`${cardClassName} place-card`}
+      onPointerOver={handlePointerOver}
+      onPointerLeave={handlePointerLeave}
+    >
       {isPremiun ? <div className="place-card__mark"><span>Premium</span></div> : ''}
-      <div className="cities__image-wrapper place-card__image-wrapper">
+      <div className={`${imgWrapClassName} place-card__image-wrapper`}>
         <a href="#">
           <img className="place-card__image" src={card.previewImage} width="260" height="200" alt="Place image"/>
         </a>

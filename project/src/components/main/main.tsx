@@ -1,14 +1,19 @@
 import CardPlaceList from '../card-place-list/card-place-list';
 import TCityPlaceCard from '../../types/city-place-card';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Map from '../map/map';
-import { AMSTERDAM_CITY } from './main.constants';
+import { AMSTERDAM_CITY } from '../../global.constants';
 
 type TMainProps = {
   offers: TCityPlaceCard[]
 }
 function Main({offers}: TMainProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
+  const classNamesByPage = useMemo(() => ({
+    list: 'cities__places-list tabs__content',
+    card: 'cities__place-card',
+    imgWrap: 'cities__image-wrapper',
+  }), []);
   const handlePointerOver = useCallback((offer: TCityPlaceCard) => {
     setActiveCard(offer);
   }, []);
@@ -106,7 +111,7 @@ function Main({offers}: TMainProps): JSX.Element {
                     <li className="places__option" tabIndex={0}>Top rated first</li>
                   </ul>
                 </form>
-                <CardPlaceList offers={offers} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
+                <CardPlaceList offers={offers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
               </section>
               <div className="cities__right-section">
                 <section className="cities__map map">
