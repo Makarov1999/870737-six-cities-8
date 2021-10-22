@@ -27,7 +27,7 @@ function Map({city, offers, activeOffer}: TMapProps): JSX.Element {
       });
     }
 
-  }, [map, offers, activeOffer]);
+  }, [map, offers, activeOffer, city]);
   return (
     <div style={{height: '100%'}} ref={mapRef}></div>
   );

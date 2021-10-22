@@ -1,13 +1,35 @@
 import CardPlaceList from '../card-place-list/card-place-list';
 import TCityPlaceCard from '../../types/city-place-card';
-import { useCallback, useMemo, useState } from 'react';
+import {useCallback, useEffect, useMemo, useState } from 'react';
+import { Dispatch } from 'redux';
 import Map from '../map/map';
-import { AMSTERDAM_CITY } from '../../global.constants';
-
+import CityList from '../city-list/city-list';
+import { connect, ConnectedProps } from 'react-redux';
+import { State } from '../../types/state';
+import { TActions } from '../../types/action';
+import { changeCity, fillOffersStore } from '../../store/action';
 type TMainProps = {
   offers: TCityPlaceCard[]
 }
-function Main({offers}: TMainProps): JSX.Element {
+const mapStateToProps = ({city, targetOffers}: State) => ({
+  city,
+  targetOffers,
+});
+const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+  onInitMain(offersInit: TCityPlaceCard[]) {
+    dispatch(fillOffersStore(offersInit));
+  },
+  onCityChange(cityName: string) {
+    dispatch(changeCity(cityName));
+  },
+});
+const mainConnector = connect(mapStateToProps, mapDispatchToProps);
+type TPropsFromReduxMain = ConnectedProps<typeof mainConnector>;
+type TConnectedMainProps = TMainProps & TPropsFromReduxMain;
+function Main({offers, city, targetOffers, onInitMain}: TConnectedMainProps): JSX.Element {
+  useEffect(() => {
+    onInitMain(offers);
+  }, []);
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
@@ -57,38 +79,7 @@ function Main({offers}: TMainProps): JSX.Element {
           <h1 className="visually-hidden">Cities</h1>
           <div className="tabs">
             <section className="locations container">
-              <ul className="locations__list tabs__list">
-                <li className="locations__item">
-                  <a className="locations__item-link tabs__item" href="#">
-                    <span>Paris</span>
-                  </a>
-                </li>
-                <li className="locations__item">
-                  <a className="locations__item-link tabs__item" href="#">
-                    <span>Cologne</span>
-                  </a>
-                </li>
-                <li className="locations__item">
-                  <a className="locations__item-link tabs__item" href="#">
-                    <span>Brussels</span>
-                  </a>
-                </li>
-                <li className="locations__item">
-                  <a className="locations__item-link tabs__item tabs__item--active">
-                    <span>Amsterdam</span>
-                  </a>
-                </li>
-                <li className="locations__item">
-                  <a className="locations__item-link tabs__item" href="#">
-                    <span>Hamburg</span>
-                  </a>
-                </li>
-                <li className="locations__item">
-                  <a className="locations__item-link tabs__item" href="#">
-                    <span>Dusseldorf</span>
-                  </a>
-                </li>
-              </ul>
+              <CityList activeCity={city.title}/>
             </section>
           </div>
           <div className="cities">
@@ -111,11 +102,11 @@ function Main({offers}: TMainProps): JSX.Element {
                     <li className="places__option" tabIndex={0}>Top rated first</li>
                   </ul>
                 </form>
-                <CardPlaceList offers={offers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
+                <CardPlaceList offers={targetOffers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
               </section>
               <div className="cities__right-section">
                 <section className="cities__map map">
-                  <Map offers={offers} city={AMSTERDAM_CITY} activeOffer={activeCard}/>
+                  <Map offers={targetOffers} city={city} activeOffer={activeCard}/>
                 </section>
               </div>
             </div>
@@ -125,4 +116,5 @@ function Main({offers}: TMainProps): JSX.Element {
     </>
   );
 }
-export default Main;
+export default mainConnector(Main);
+export { Main };
