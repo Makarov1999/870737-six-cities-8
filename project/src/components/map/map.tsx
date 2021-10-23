@@ -6,7 +6,7 @@ import { Marker } from 'leaflet';
 import { ACTIVE_MARKER_ICON, DEFAULT_MARKER_ICON } from './map.constants';
 
 type TMapProps = {
-    city: TCity,
+    city: TCity ,
     offers: TCityPlaceCard[],
     activeOffer: TCityPlaceCard | null
 }
@@ -25,6 +25,7 @@ function Map({city, offers, activeOffer}: TMapProps): JSX.Element {
           : DEFAULT_MARKER_ICON)
           .addTo(map);
       });
+      map.setView([city.location.latitude, city.location.longitude], city.location.zoom);
     }
 
   }, [map, offers, activeOffer, city]);

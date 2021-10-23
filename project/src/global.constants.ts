@@ -72,8 +72,8 @@ export const CITIES: TCity[] = [
     id: 5,
     title: 'Hamburg',
     location: {
-      latitude: 53.551085,
-      longitude: 53.551085,
+      latitude: 53.551086,
+      longitude: 9.993682,
       zoom: 12,
     },
   },
