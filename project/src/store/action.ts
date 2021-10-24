@@ -1,14 +1,13 @@
 import { ActionType, TChangeCityAction, TFillOffersAction, TSortByPopularDecrease, TSortByPriceDecrease, TSortByPriceIncrease, TSortByRateDecrease } from '../types/action';
-import TCityPlaceCard from '../types/city-place-card';
+import { TCity } from '../types/city';
 
-export const fillOffersStore = (offers: TCityPlaceCard[]): TFillOffersAction => ({
+export const fillOffersStore = (): TFillOffersAction => ({
   type: ActionType.FillOffersStore,
-  offers,
 });
 
-export const changeCity = (cityName: string): TChangeCityAction => ({
+export const changeCity = (city: TCity): TChangeCityAction => ({
   type: ActionType.ChangeCity,
-  cityName,
+  city,
 });
 
 export const sortByPriceIncrease = (): TSortByPriceIncrease => ({

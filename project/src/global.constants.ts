@@ -31,6 +31,16 @@ type TMonthDictionary = {
 
 export const MONTHS_DICTIONARY: TMonthDictionary  = {...MONTHS_NAMES};
 
+export const DEFAULT_CITY = {
+  id: 1,
+  title: 'Paris',
+  location: {
+    latitude: 48.8589466,
+    longitude: 2.2769956,
+    zoom: 12,
+  },
+};
+
 export const CITIES: TCity[] = [
   {
     id: 1,

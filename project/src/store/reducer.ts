@@ -1,36 +1,36 @@
 import { ActionType, TActions } from '../types/action';
-import { State } from '../types/state';
+import { TState } from '../types/state';
 import { CITIES } from '../global.constants';
-import { TCity } from '../types/city';
-
-const initialState: State= {
+import { OFFERS } from '../mocks/offers';
+import { DEFAULT_CITY } from '../global.constants';
+const initialState: TState= {
   offers: [],
-  city: CITIES[0],
+  activeCity: CITIES[0],
   targetOffers: [],
   sortOffers: [],
 };
-const DEFAULT_CITY_NAME = 'Paris';
-const reducer = (state: State = initialState, action: TActions): State => {
+
+const reducer = (state: TState = initialState, action: TActions): TState => {
   switch(action.type) {
     case ActionType.FillOffersStore: {
-      const targetOffers = action.offers.filter((offer) => offer.city.name === DEFAULT_CITY_NAME);
-      const city = CITIES.find((cityEl) => cityEl.title === DEFAULT_CITY_NAME) as TCity;
+      const targetOffers = OFFERS.filter((offer) => offer.city.name === DEFAULT_CITY.title);
+      const activeCity = DEFAULT_CITY;
       const sortOffers = targetOffers.slice();
       return {
         ...state,
-        offers: action.offers,
-        city,
+        offers: OFFERS.slice(),
+        activeCity,
         targetOffers,
         sortOffers,
       };
     }
     case ActionType.ChangeCity: {
-      const targetOffers = state.offers.filter((offer) => offer.city.name === action.cityName);
+      const targetOffers = state.offers.filter((offer) => offer.city.name === action.city.title);
       const sortOffers = targetOffers.slice();
-      const city = CITIES.find((cityEl) => cityEl.title === action.cityName) as TCity;
+      const activeCity = action.city;
       return {
         ...state,
-        city,
+        activeCity,
         targetOffers,
         sortOffers,
       };
@@ -38,7 +38,7 @@ const reducer = (state: State = initialState, action: TActions): State => {
     case ActionType.SortPriceIncrease: {
       const sortOffers = state.targetOffers
         .slice()
-        .sort((leftOffer, rightOffer) => (leftOffer.price - rightOffer.price));
+        .sort((prevOffer, nextOffer) => (prevOffer.price - nextOffer.price));
       return {
         ...state,
         sortOffers,
@@ -47,7 +47,7 @@ const reducer = (state: State = initialState, action: TActions): State => {
     case ActionType.SortPriceDecrease: {
       const sortOffers = state.targetOffers
         .slice()
-        .sort((leftOffer, rightOffer) => (rightOffer.price - leftOffer.price));
+        .sort((prevOffer, nextOffer) => (nextOffer.price - prevOffer.price));
       return {
         ...state,
         sortOffers,
@@ -56,7 +56,7 @@ const reducer = (state: State = initialState, action: TActions): State => {
     case ActionType.SortRateDecrease: {
       const sortOffers = state.targetOffers
         .slice()
-        .sort((leftOffer, rightOffer) => (rightOffer.rating - leftOffer.rating));
+        .sort((prevOffer, nextOffer) => (nextOffer.rating - prevOffer.rating));
       return {
         ...state,
         sortOffers,

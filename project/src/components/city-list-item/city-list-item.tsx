@@ -1,20 +1,21 @@
-import { useCallback, MouseEvent } from 'react';
+import { MouseEvent } from 'react';
+import { TCity } from '../../types/city';
 
 type TCityListItemProps = {
-  cityName: string;
+  city: TCity;
   isActive: boolean;
-  onCityChange: (city: string) => void;
+  onCityChange: (city: TCity) => void;
 };
-function CityListItem({cityName, isActive, onCityChange}: TCityListItemProps): JSX.Element {
-  const handleItemLinkClick = useCallback((e: MouseEvent<HTMLAnchorElement>) => {
+function CityListItem({city, isActive, onCityChange}: TCityListItemProps): JSX.Element {
+  const handleItemLinkClick =(e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    onCityChange(e.currentTarget.textContent as string);
+    onCityChange(city);
 
-  }, []);
+  };
   return (
     <li className="locations__item">
       <a className={`locations__item-link tabs__item ${isActive ? 'tabs__item--active' : ''}`} href="#" onClick={handleItemLinkClick}>
-        <span>{cityName}</span>
+        <span>{city.title}</span>
       </a>
     </li>
   );

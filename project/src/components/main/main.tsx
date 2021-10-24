@@ -3,26 +3,25 @@ import TCityPlaceCard from '../../types/city-place-card';
 import {useCallback, useEffect, useMemo, useState } from 'react';
 import { Dispatch } from 'redux';
 import Map from '../map/map';
+import MainEmpty from '../main-empty/main-empty';
 import CityList from '../city-list/city-list';
 import { connect, ConnectedProps } from 'react-redux';
-import { State } from '../../types/state';
+import { TState } from '../../types/state';
 import { TActions } from '../../types/action';
 import { changeCity, fillOffersStore, sortByPopularDecrease, sortByPriceDecrease, sortByPriceIncrease, sortByRateDecrease } from '../../store/action';
-import Sort from '../../sort/sort';
-type TMainProps = {
-  offers: TCityPlaceCard[]
-}
-const mapStateToProps = ({city, targetOffers, sortOffers}: State) => ({
-  city,
-  targetOffers,
+import SortList from '../../sort-list/sort-list';
+import { TCity } from '../../types/city';
+
+const mapStateToProps = ({activeCity, sortOffers}: TState) => ({
+  activeCity,
   sortOffers,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
-  onInitMain(offersInit: TCityPlaceCard[]) {
-    dispatch(fillOffersStore(offersInit));
+  onInitMain() {
+    dispatch(fillOffersStore());
   },
-  onCityChange(cityName: string) {
-    dispatch(changeCity(cityName));
+  onCityChange(city: TCity) {
+    dispatch(changeCity(city));
   },
   onSortByPriceIncrease() {
     dispatch(sortByPriceIncrease());
@@ -38,12 +37,9 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   },
 });
 const mainConnector = connect(mapStateToProps, mapDispatchToProps);
-type TPropsFromReduxMain = ConnectedProps<typeof mainConnector>;
-type TConnectedMainProps = TMainProps & TPropsFromReduxMain;
+type TConnectedMainProps = ConnectedProps<typeof mainConnector>;
 function Main({
-  offers,
-  city,
-  targetOffers,
+  activeCity,
   sortOffers,
   onInitMain,
   onCityChange,
@@ -53,7 +49,7 @@ function Main({
   onSortByRateDecrease,
 }: TConnectedMainProps): JSX.Element {
   useEffect(() => {
-    onInitMain(offers);
+    onInitMain();
   }, []);
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
   const classNamesByPage = useMemo(() => ({
@@ -100,32 +96,35 @@ function Main({
             </div>
           </div>
         </header>
-        <main className="page__main page__main--index">
+        <main className={`page__main page__main--index ${sortOffers.length === 0 ? 'page__main--index-empty' : ''}` }>
           <h1 className="visually-hidden">Cities</h1>
           <div className="tabs">
             <section className="locations container">
-              <CityList activeCity={city.title} onCityChange={onCityChange}/>
+              <CityList activeCity={activeCity.title} onCityChange={onCityChange}/>
             </section>
           </div>
           <div className="cities">
-            <div className="cities__places-container container">
-              <section className="cities__places places">
-                <h2 className="visually-hidden">Places</h2>
-                <b className="places__found">{`${targetOffers.length} places to stay in ${city.title}`}</b>
-                <Sort
-                  onSortByPopularDecrease={onSortByPopular}
-                  onSortByPriceIncrease={onSortByPriceIncrease}
-                  onSortByPriceDecrease={onSortByPriceDecrease}
-                  onSortByRateDecrease={onSortByRateDecrease}
-                />
-                <CardPlaceList offers={sortOffers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
-              </section>
-              <div className="cities__right-section">
-                <section className="cities__map map">
-                  <Map offers={targetOffers} city={city} activeOffer={activeCard}/>
+            {sortOffers.length > 0
+              ?
+              <div className="cities__places-container container">
+                <section className="cities__places places">
+                  <h2 className="visually-hidden">Places</h2>
+                  <b className="places__found">{`${sortOffers.length} places to stay in ${activeCity.title}`}</b>
+                  <SortList
+                    onSortByPopularDecrease={onSortByPopular}
+                    onSortByPriceIncrease={onSortByPriceIncrease}
+                    onSortByPriceDecrease={onSortByPriceDecrease}
+                    onSortByRateDecrease={onSortByRateDecrease}
+                  />
+                  <CardPlaceList offers={sortOffers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
                 </section>
+                <div className="cities__right-section">
+                  <section className="cities__map map">
+                    <Map offers={sortOffers} city={activeCity} activeOffer={activeCard}/>
+                  </section>
+                </div>
               </div>
-            </div>
+              : <MainEmpty/>}
           </div>
         </main>
       </div>

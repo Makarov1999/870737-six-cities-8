@@ -1,14 +1,16 @@
 import CityListItem from '../city-list-item/city-list-item';
-import { CITIES } from './city-list.constants';
+//import { CITIES } from './city-list.constants';
+import { CITIES } from '../../global.constants';
+import { TCity } from '../../types/city';
 type TCityListProps = {
   activeCity: string;
-  onCityChange: (city: string) => void;
+  onCityChange: (city: TCity) => void;
 };
 function CityList({activeCity, onCityChange}: TCityListProps): JSX.Element {
   return (
     <ul className="locations__list tabs__list">
       {CITIES.map((city) => (
-        <CityListItem cityName={city.name} isActive={activeCity === city.name} key={city.id} onCityChange={onCityChange}/>
+        <CityListItem city={city} isActive={activeCity === city.title} key={city.id} onCityChange={onCityChange}/>
       ))}
     </ul>
   );

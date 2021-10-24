@@ -1,4 +1,4 @@
-import TCityPlaceCard from './city-place-card';
+import { TCity } from './city';
 
 export enum ActionType {
   FillOffersStore = 'offers/fillStore',
@@ -10,13 +10,12 @@ export enum ActionType {
 }
 
 export type TFillOffersAction = {
-  type: ActionType.FillOffersStore,
-  offers: TCityPlaceCard[],
+  type: ActionType.FillOffersStore
 }
 
 export type TChangeCityAction = {
   type: ActionType.ChangeCity,
-  cityName: string,
+  city: TCity,
 }
 
 export type TSortByPriceIncrease = {

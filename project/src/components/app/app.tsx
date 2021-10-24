@@ -17,7 +17,7 @@ function App({offers}: TAppProps): JSX.Element {
     <BrowserRouter>
       <Switch>
         <Route path={AppRoutes.Main} exact>
-          <Main offers={offers}/>
+          <Main/>
         </Route>
         <Route path={AppRoutes.SignIn} exact>
           <Login/>

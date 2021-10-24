@@ -1,9 +1,9 @@
 import { TCity } from './city';
 import TCityPlaceCard from './city-place-card';
 
-export type State = {
+export type TState = {
   offers: TCityPlaceCard[],
-  city: TCity,
+  activeCity: TCity,
   targetOffers: TCityPlaceCard[],
   sortOffers: TCityPlaceCard[]
 }
