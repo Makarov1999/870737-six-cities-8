@@ -1,75 +1,26 @@
 import { useState } from 'react';
-import { SortTypes, SortTypesText} from './sort-list.constants';
+import { MapSortKeys } from '../store/map-sort';
+import {SORT_LIST_ITEMS} from './sort-list.constants';
 
 type TSortListProps = {
-  onSortByPriceIncrease: () => void;
-  onSortByPriceDecrease: () => void;
-  onSortByRateDecrease: () => void;
-  onSortByPopularDecrease: () => void;
+  onSortByType: (sortType: MapSortKeys) => void;
 };
-function SortList({onSortByPriceIncrease, onSortByPriceDecrease, onSortByRateDecrease, onSortByPopularDecrease}: TSortListProps): JSX.Element {
+function SortList({ onSortByType}: TSortListProps): JSX.Element {
   const [isSortListActive, setSortListActive] = useState<boolean>(false);
-  const [sortType, setSortType] = useState<SortTypes>(SortTypes.Popular);
-  const [sortTypeText, setSortTypeText] = useState<SortTypesText>(SortTypesText.Popular);
-  const setNewSortType = (sort: SortTypes, text: SortTypesText): void => {
-    setSortType(sort);
+  const [sortTypeInList, setSortTypeInList] = useState<string>('Popular');
+  const [sortTypeText, setSortTypeText] = useState<string>('Popular');
+  const setNewSortType = (sort: string, text: string): void => {
+    setSortTypeInList(sort);
     setSortTypeText(text);
     setSortListActive(false);
   };
   const handleOpenSortListClick = () => {
     setSortListActive((prevState) => !prevState);
   };
-  const handlePopularClick = () => {
-    setNewSortType(SortTypes.Popular, SortTypesText.Popular);
-    onSortByPopularDecrease();
-
+  const handleSortTypeChange = (sortType: MapSortKeys, sortText: string) => {
+    setNewSortType(sortType, sortText);
+    onSortByType(sortType);
   };
-  const handlePriceIncreaseClick = () => {
-    setNewSortType(SortTypes.PriceIncrease, SortTypesText.PriceIncrease);
-    onSortByPriceIncrease();
-
-  };
-  const handlePriceDecreaseClick = () => {
-    setNewSortType(SortTypes.PriceDecrease, SortTypesText.PriceDecrease);
-    onSortByPriceDecrease();
-  };
-  const handleRateDecreaseClick =() => {
-    setNewSortType(SortTypes.RateDecrease, SortTypesText.RateDecrease);
-    onSortByRateDecrease();
-  };
-  type TSortListItem = {
-    id: number,
-    text: SortTypesText,
-    sortType: SortTypes,
-    onClickHandler: () => void
-  }
-  const SORT_LIST_ITEMS: TSortListItem[] = [
-    {
-      id: 1,
-      text: SortTypesText.Popular,
-      sortType: SortTypes.Popular,
-      onClickHandler: handlePopularClick,
-    },
-    {
-      id: 2,
-      text: SortTypesText.PriceIncrease,
-      sortType: SortTypes.PriceIncrease,
-      onClickHandler: handlePriceIncreaseClick,
-    },
-    {
-      id: 3,
-      text: SortTypesText.PriceDecrease,
-      sortType: SortTypes.PriceDecrease,
-      onClickHandler: handlePriceDecreaseClick,
-    },
-    {
-      id: 4,
-      text: SortTypesText.RateDecrease,
-      sortType: SortTypes.RateDecrease,
-      onClickHandler: handleRateDecreaseClick,
-    },
-
-  ];
   return (
     <form className="places__sorting" action="#" method="get">
       <span className="places__sorting-caption">Sort by </span>
@@ -81,7 +32,7 @@ function SortList({onSortByPriceIncrease, onSortByPriceDecrease, onSortByRateDec
       </span>
       <ul className={`places__options places__options--custom ${isSortListActive ? 'places__options--opened' : ''}`}>
         {SORT_LIST_ITEMS.map((item) =>(
-          <li className={`places__option ${sortType === item.sortType ? 'places__option--active': ''}`} tabIndex={0} key={item.id} onClick={item.onClickHandler}>{item.text}</li>
+          <li className={`places__option ${sortTypeInList === item.sortType ? 'places__option--active': ''}`} tabIndex={0} key={item.id} onClick={() => {handleSortTypeChange(item.sortType, item.text);}}>{item.text}</li>
         ))}
       </ul>
     </form>

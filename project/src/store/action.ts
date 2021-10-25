@@ -1,5 +1,6 @@
-import { ActionType, TChangeCityAction, TFillOffersAction, TSortByPopularDecrease, TSortByPriceDecrease, TSortByPriceIncrease, TSortByRateDecrease } from '../types/action';
+import { ActionType, TChangeCityAction, TFillOffersAction, TSortByType } from '../types/action';
 import { TCity } from '../types/city';
+import { MapSortKeys } from './map-sort';
 
 export const fillOffersStore = (): TFillOffersAction => ({
   type: ActionType.FillOffersStore,
@@ -9,19 +10,8 @@ export const changeCity = (city: TCity): TChangeCityAction => ({
   type: ActionType.ChangeCity,
   city,
 });
-
-export const sortByPriceIncrease = (): TSortByPriceIncrease => ({
-  type: ActionType.SortPriceIncrease,
+export const sortByType = (sortType: MapSortKeys): TSortByType => ({
+  type: ActionType.SortByType,
+  sortType,
 });
 
-export const sortByPriceDecrease = (): TSortByPriceDecrease => ({
-  type: ActionType.SortPriceDecrease,
-});
-
-export const sortByRateDecrease = (): TSortByRateDecrease => ({
-  type: ActionType.SortRateDecrease,
-});
-
-export const sortByPopularDecrease = (): TSortByPopularDecrease => ({
-  type: ActionType.SortPopularDecrease,
-});

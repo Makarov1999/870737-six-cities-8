@@ -8,9 +8,10 @@ import CityList from '../city-list/city-list';
 import { connect, ConnectedProps } from 'react-redux';
 import { TState } from '../../types/state';
 import { TActions } from '../../types/action';
-import { changeCity, fillOffersStore, sortByPopularDecrease, sortByPriceDecrease, sortByPriceIncrease, sortByRateDecrease } from '../../store/action';
+import { changeCity, fillOffersStore, sortByType } from '../../store/action';
 import SortList from '../../sort-list/sort-list';
 import { TCity } from '../../types/city';
+import { MapSortKeys } from '../../store/map-sort';
 
 const mapStateToProps = ({activeCity, sortOffers}: TState) => ({
   activeCity,
@@ -23,17 +24,8 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onCityChange(city: TCity) {
     dispatch(changeCity(city));
   },
-  onSortByPriceIncrease() {
-    dispatch(sortByPriceIncrease());
-  },
-  onSortByPriceDecrease() {
-    dispatch(sortByPriceDecrease());
-  },
-  onSortByRateDecrease() {
-    dispatch(sortByRateDecrease());
-  },
-  onSortByPopular() {
-    dispatch(sortByPopularDecrease());
+  onSortByType(sortType: MapSortKeys) {
+    dispatch(sortByType(sortType));
   },
 });
 const mainConnector = connect(mapStateToProps, mapDispatchToProps);
@@ -43,10 +35,7 @@ function Main({
   sortOffers,
   onInitMain,
   onCityChange,
-  onSortByPopular,
-  onSortByPriceDecrease,
-  onSortByPriceIncrease,
-  onSortByRateDecrease,
+  onSortByType,
 }: TConnectedMainProps): JSX.Element {
   useEffect(() => {
     onInitMain();
@@ -110,12 +99,7 @@ function Main({
                 <section className="cities__places places">
                   <h2 className="visually-hidden">Places</h2>
                   <b className="places__found">{`${sortOffers.length} places to stay in ${activeCity.title}`}</b>
-                  <SortList
-                    onSortByPopularDecrease={onSortByPopular}
-                    onSortByPriceIncrease={onSortByPriceIncrease}
-                    onSortByPriceDecrease={onSortByPriceDecrease}
-                    onSortByRateDecrease={onSortByRateDecrease}
-                  />
+                  <SortList onSortByType={onSortByType}/>
                   <CardPlaceList offers={sortOffers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
                 </section>
                 <div className="cities__right-section">

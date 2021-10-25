@@ -1,14 +1,30 @@
-export enum SortTypesText {
-  Popular = 'Popular',
-  PriceIncrease = 'Price: low to high',
-  PriceDecrease = 'Price: high to low',
-  RateDecrease = 'Top rated first',
+import { MapSortKeys } from '../store/map-sort';
+
+type TSortListItem = {
+  id: number,
+  text: string,
+  sortType: MapSortKeys,
 }
 
-export enum SortTypes {
-  Popular = 'Popular',
-  PriceIncrease = 'PriceIncrease',
-  PriceDecrease = ' PriceDecrease',
-  RateDecrease = 'RateDecrease',
-}
-
+export const SORT_LIST_ITEMS: TSortListItem[] = [
+  {
+    id: 1,
+    text: 'Popular',
+    sortType: 'Popular',
+  },
+  {
+    id: 2,
+    text: 'Price: low to high',
+    sortType: 'PriceIncrease',
+  },
+  {
+    id: 3,
+    text: 'Price: high to low',
+    sortType: 'PriceDecrease',
+  },
+  {
+    id: 4,
+    text: 'Top rated first',
+    sortType: 'RateDecrease',
+  },
+];
