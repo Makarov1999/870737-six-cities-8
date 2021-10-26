@@ -3,7 +3,7 @@ import { TState } from '../types/state';
 import { CITIES } from '../global.constants';
 import { OFFERS } from '../mocks/offers';
 import { DEFAULT_CITY } from '../global.constants';
-import { MapSort } from './map-sort';
+import { sortTypeToSortingGetter } from '../utils/sort';
 const initialState: TState= {
   offers: [],
   activeCity: CITIES[0],
@@ -36,7 +36,7 @@ const reducer = (state: TState = initialState, action: TActions): TState => {
       };
     }
     case ActionType.SortByType: {
-      const sortOffers = MapSort[action.sortType](state.targetOffers);
+      const sortOffers = sortTypeToSortingGetter[action.sortType](state.targetOffers);
       return {
         ...state,
         sortOffers,

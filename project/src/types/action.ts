@@ -1,4 +1,4 @@
-import { MapSortKeys } from '../store/map-sort';
+import TSortType from './sort-type';
 import { TCity } from './city';
 
 export enum ActionType {
@@ -19,7 +19,7 @@ export type TChangeCityAction = {
 
 export type TSortByType = {
   type: ActionType.SortByType;
-  sortType: MapSortKeys,
+  sortType: TSortType,
 }
 
 export type TActions = TFillOffersAction | TChangeCityAction | TSortByType;

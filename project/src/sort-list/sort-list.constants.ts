@@ -1,9 +1,9 @@
-import { MapSortKeys } from '../store/map-sort';
+import TSortType from '../types/sort-type';
 
 type TSortListItem = {
   id: number,
   text: string,
-  sortType: MapSortKeys,
+  sortType: TSortType,
 }
 
 export const SORT_LIST_ITEMS: TSortListItem[] = [

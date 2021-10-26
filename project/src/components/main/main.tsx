@@ -11,7 +11,7 @@ import { TActions } from '../../types/action';
 import { changeCity, fillOffersStore, sortByType } from '../../store/action';
 import SortList from '../../sort-list/sort-list';
 import { TCity } from '../../types/city';
-import { MapSortKeys } from '../../store/map-sort';
+import TSortType from '../../types/sort-type';
 
 const mapStateToProps = ({activeCity, sortOffers}: TState) => ({
   activeCity,
@@ -24,7 +24,7 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onCityChange(city: TCity) {
     dispatch(changeCity(city));
   },
-  onSortByType(sortType: MapSortKeys) {
+  onSortByType(sortType: TSortType) {
     dispatch(sortByType(sortType));
   },
 });
