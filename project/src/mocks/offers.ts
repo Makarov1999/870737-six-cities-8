@@ -133,4 +133,37 @@ export const OFFERS: TCityPlaceCard[] = [
     isPremiun: true,
     rating: 5,
   },
+  {
+    id: 5,
+    bedrooms: 3,
+    city: {
+      location: {
+        latitude: 48.8589466,
+        longitude: 2.2769956,
+        zoom: 11,
+      },
+      name: 'Paris',
+    },
+    host: {
+      id: 1,
+      avatarUrl: 'img/avatar-angelina.jpg',
+      isPro: true,
+      name: 'Angelina',
+    },
+    images: ['img/apartment-01.jpg', 'img/apartment-02.jpg', 'img/apartment-03.jpg', 'img/apartment-01.jpg', 'img/apartment-02.jpg', 'img/apartment-03.jpg'],
+    goods: ['Heating', 'Kitchen', 'Cable TV', 'Washing machine', 'Coffee machine', 'Dishwasher'],
+    maxAdults: 4,
+    location: {
+      latitude: 48.8930026,
+      longitude: 2.2297353,
+      zoom: 11,
+    },
+    type: 'Apartment',
+    title: 'Nice, cozy, warm big bed apartment',
+    price: 180,
+    previewImage: 'img/apartment-02.jpg',
+    isFavorite: false,
+    isPremiun: true,
+    rating: 5,
+  },
 ];

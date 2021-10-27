@@ -18,7 +18,7 @@ function useMap(mapRef: MutableRefObject<HTMLElement | null> , city: TCity): Map
         MAP_URL_TEMPLATE,
         {
           attribution:
-                  MAP_ATTRIBUTION,
+            MAP_ATTRIBUTION,
         },
       );
       instance.addLayer(layer);
