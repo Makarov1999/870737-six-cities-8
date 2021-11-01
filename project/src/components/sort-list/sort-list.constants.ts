@@ -1,4 +1,4 @@
-import TSortType from '../types/sort-type';
+import TSortType from '../../types/sort-type';
 
 type TSortListItem = {
   id: number,

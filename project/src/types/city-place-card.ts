@@ -1,9 +1,5 @@
 import TLocation from './location';
-
-type TCityINCard = {
-    location: TLocation,
-    name: string
-}
+import TCityInCard from './city-in-card';
 
 type THost = {
     id: number,
@@ -15,7 +11,7 @@ type THost = {
 type TCityPlaceCard = {
     id: number,
     bedrooms: number,
-    city: TCityINCard,
+    city: TCityInCard,
     host: THost,
     images: string[],
     location: TLocation,

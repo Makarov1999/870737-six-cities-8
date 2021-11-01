@@ -1,6 +1,6 @@
 import CardPlaceList from '../card-place-list/card-place-list';
 import TCityPlaceCard from '../../types/city-place-card';
-import {useCallback, useEffect, useMemo, useState } from 'react';
+import {useCallback, useMemo, useState } from 'react';
 import { Dispatch } from 'redux';
 import Map from '../map/map';
 import MainEmpty from '../main-empty/main-empty';
@@ -8,8 +8,8 @@ import CityList from '../city-list/city-list';
 import { connect, ConnectedProps } from 'react-redux';
 import { TState } from '../../types/state';
 import { TActions } from '../../types/action';
-import { changeCity, fillOffersStore, sortByType } from '../../store/action';
-import SortList from '../../sort-list/sort-list';
+import { changeCity, sortByType } from '../../store/action';
+import SortList from '../sort-list/sort-list';
 import { TCity } from '../../types/city';
 import TSortType from '../../types/sort-type';
 
@@ -18,9 +18,6 @@ const mapStateToProps = ({activeCity, sortOffers}: TState) => ({
   sortOffers,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
-  onInitMain() {
-    dispatch(fillOffersStore());
-  },
   onCityChange(city: TCity) {
     dispatch(changeCity(city));
   },
@@ -33,13 +30,9 @@ type TConnectedMainProps = ConnectedProps<typeof mainConnector>;
 function Main({
   activeCity,
   sortOffers,
-  onInitMain,
   onCityChange,
   onSortByType,
 }: TConnectedMainProps): JSX.Element {
-  useEffect(() => {
-    onInitMain();
-  }, []);
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
