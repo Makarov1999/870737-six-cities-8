@@ -1,9 +1,8 @@
 import axios, {AxiosInstance, AxiosResponse, AxiosError, AxiosRequestConfig} from 'axios';
 import { getToken } from '../token/token';
 import { BASE_URL, HttpCode, REQUEST_TIMEOUT } from './api.constants';
-import { UnauthorizedCallback } from './api.types';
 
-export const createApi = (onUnauthorized: UnauthorizedCallback): AxiosInstance => {
+export const createApi = (onUnauthorized: VoidFunction): AxiosInstance => {
   const api = axios.create({
     baseURL: BASE_URL,
     timeout: REQUEST_TIMEOUT,
