@@ -45,10 +45,9 @@ const reducer = (state: TState = initialState, action: TActions): TState => {
       };
     }
     case ActionType.RequireAuthorization: {
-      const authorizationStatus = action.authorizationStatus;
       return {
         ...state,
-        authorizationStatus,
+        authorizationStatus: action.authorizationStatus,
       };
     }
     case ActionType.RequireLogout: {

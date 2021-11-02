@@ -8,8 +8,6 @@ import { Provider } from 'react-redux';
 import  thunk  from 'redux-thunk';
 import { createApi } from './services/api/api';
 import 'leaflet/dist/leaflet.css';
-import { fetchOffersAction } from './store/api-actions';
-import { TThunkActionDispatch } from './types/action';
 import { AuthStatuses } from './global.constants';
 import { requireAuthorization } from './store/action';
 
@@ -19,7 +17,6 @@ const store = createStore(
   composeWithDevTools(
     applyMiddleware(thunk.withExtraArgument(api)),
   ));
-(store.dispatch as TThunkActionDispatch)(fetchOffersAction());
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

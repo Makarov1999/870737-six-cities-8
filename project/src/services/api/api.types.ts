@@ -1,1 +1,1 @@
-export type UnauthorizedCallback = () => void;
+export type UnauthorizedCallback = VoidFunction;

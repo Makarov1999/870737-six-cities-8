@@ -11,15 +11,26 @@ import { TState } from '../../types/state';
 import { connect, ConnectedProps } from 'react-redux';
 import Spinner from '../spinner/spinner';
 import { OFFERS } from '../../mocks/offers';
+import { Dispatch, useEffect } from 'react';
+import { TActions, TThunkActionDispatch } from '../../types/action';
+import { fetchOffersAction } from '../../store/api-actions';
 
 
 const mapStateToProps = ({isDataLoaded}: TState) => ({
   isDataLoaded,
 });
-const appConnector = connect(mapStateToProps);
+const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+  loadOffers() {
+    (dispatch as TThunkActionDispatch)(fetchOffersAction());
+  },
+});
+const appConnector = connect(mapStateToProps, mapDispatchToProps);
  type TConnectedAppProps = ConnectedProps<typeof appConnector>;
 
-function App({isDataLoaded}: TConnectedAppProps): JSX.Element {
+function App({isDataLoaded, loadOffers}: TConnectedAppProps): JSX.Element {
+  useEffect(() => {
+    loadOffers();
+  }, []);
   if (!isDataLoaded) {
     return(
       <Spinner/>
