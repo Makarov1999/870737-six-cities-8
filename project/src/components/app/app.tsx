@@ -4,15 +4,38 @@ import Login from '../login/login';
 import Main from '../main/main';
 import NotFound from '../not-found/not-found';
 import Property from '../property/property';
-import {AppRoutes, AuthStatuses} from './app.constants';
+import {AppRoutes} from './app.constants';
+import { AuthStatuses } from '../../global.constants';
 import PrivateRoute from '../private-route/private-route';
-import TCityPlaceCard from '../../types/city-place-card';
+import { TState } from '../../types/state';
+import { connect, ConnectedProps } from 'react-redux';
+import Spinner from '../spinner/spinner';
+import { OFFERS } from '../../mocks/offers';
+import { Dispatch, useEffect } from 'react';
+import { TActions, TThunkActionDispatch } from '../../types/action';
+import { fetchOffersAction } from '../../store/api-actions';
 
-type TAppProps = {
-  offers: TCityPlaceCard[]
-};
 
-function App({offers}: TAppProps): JSX.Element {
+const mapStateToProps = ({isDataLoaded}: TState) => ({
+  isDataLoaded,
+});
+const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+  loadOffers() {
+    (dispatch as TThunkActionDispatch)(fetchOffersAction());
+  },
+});
+const appConnector = connect(mapStateToProps, mapDispatchToProps);
+ type TConnectedAppProps = ConnectedProps<typeof appConnector>;
+
+function App({isDataLoaded, loadOffers}: TConnectedAppProps): JSX.Element {
+  useEffect(() => {
+    loadOffers();
+  }, []);
+  if (!isDataLoaded) {
+    return(
+      <Spinner/>
+    );
+  }
   return(
     <BrowserRouter>
       <Switch>
@@ -24,7 +47,7 @@ function App({offers}: TAppProps): JSX.Element {
         </Route>
         <PrivateRoute
           path={AppRoutes.Favorites}
-          render={() => <Favorite cards={offers}/>}
+          render={() => <Favorite cards={OFFERS}/>}
           athorizationStatus={AuthStatuses.Auth}
           exact
         >
@@ -40,4 +63,4 @@ function App({offers}: TAppProps): JSX.Element {
   );
 }
 
-export default App;
+export default appConnector(App);

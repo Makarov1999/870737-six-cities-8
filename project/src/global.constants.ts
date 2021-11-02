@@ -97,3 +97,9 @@ export const CITIES: TCity[] = [
     },
   },
 ];
+
+export enum AuthStatuses {
+  Auth = 'AUTH',
+  NoAuth = 'NO_AUTH',
+  Unknown = 'UNKNOWN'
+}

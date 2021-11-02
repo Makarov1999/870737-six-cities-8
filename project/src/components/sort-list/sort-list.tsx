@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import TSortType from '../types/sort-type';
+import TSortType from '../../types/sort-type';
 import { SORT_LIST_ITEMS } from './sort-list.constants';
 
 type TSortListProps = {
