@@ -1,5 +1,6 @@
 import { AuthStatuses } from '../global.constants';
-import { ActionType, TChangeCityAction, TFillOffersAction, TRequireAuthorizationAction, TRequireLogoutAction, TSortByTypeAction } from '../types/action';
+import { ActionType, TChangeCityAction, TFillOffersAction, TRequireAuthorizationAction, TRequireLogoutAction, TSetAuthInfoAction, TSortByTypeAction } from '../types/action';
+import TAuthInfo from '../types/auth-info';
 import { TCity } from '../types/city';
 import TCityPlaceCard from '../types/city-place-card';
 import TSortType from '../types/sort-type';
@@ -23,6 +24,12 @@ export const requireAuthorization = (authorizationStatus: AuthStatuses): TRequir
 });
 export const requireLogout = (): TRequireLogoutAction => ({
   type: ActionType.RequireLogout,
+});
+
+export const setAuthInfo = (authInfo: TAuthInfo): TSetAuthInfoAction => ({
+  type: ActionType.SetAuthInfo,
+  authInfo,
+
 });
 
 

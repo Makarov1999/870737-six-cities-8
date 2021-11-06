@@ -1,6 +1,51 @@
 import Logo from '../logo/logo';
+import {connect, ConnectedProps} from 'react-redux';
+import { TRootState } from '../../store/reducer';
+import { Dispatch, FormEvent, useRef, useState } from 'react';
+import { TActions, TThunkActionDispatch} from '../../types/action';
+import { TAuthData } from '../../types/auth-data';
+import { loginAction } from '../../store/api-actions';
+import { AuthStatuses } from '../../global.constants';
+import { Redirect } from 'react-router';
+import { AppRoutes } from '../app/app.constants';
+import './login.css';
 
-function Login(): JSX.Element {
+const mapStateToProps = ({ USER }: TRootState) => ({
+  authorizationStatus: USER.authorizationStatus,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+  onLoginFormSubmit(authData: TAuthData) {
+    (dispatch as TThunkActionDispatch)(loginAction(authData));
+  },
+});
+const loginConnector = connect(mapStateToProps, mapDispatchToProps);
+type TLoginConnectedProps = ConnectedProps<typeof loginConnector>;
+
+function Login({authorizationStatus, onLoginFormSubmit}: TLoginConnectedProps): JSX.Element {
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+  const [loginFormError, setLoginFormError] = useState<string | null>(null);
+  const handleLoginFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoginFormError(null);
+    const reg = /(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+/g;
+    if (emailRef.current && passwordRef.current) {
+      if (passwordRef.current.value.match(reg)) {
+        onLoginFormSubmit({
+          email: emailRef.current.value,
+          password: passwordRef.current.value,
+        });
+      } else {
+        setLoginFormError('Password must include 1 letter and 1 number at least');
+      }
+    }
+  };
+  if (authorizationStatus === AuthStatuses.Auth) {
+    return (
+      <Redirect to={AppRoutes.Main}/>
+    );
+  }
   return (
     <>
       <div style={{display: 'none'}}>
@@ -22,14 +67,15 @@ function Login(): JSX.Element {
           <div className="page__login-container container">
             <section className="login">
               <h1 className="login__title">Sign in</h1>
-              <form className="login__form form" action="#" method="post">
+              <form className="login__form form" action="#" method="post" onSubmit={handleLoginFormSubmit}>
                 <div className="login__input-wrapper form__input-wrapper">
                   <label className="visually-hidden">E-mail</label>
-                  <input className="login__input form__input" type="email" name="email" placeholder="Email" required/>
+                  <input ref={emailRef} className="login__input form__input" type="email" name="email" placeholder="Email" required/>
                 </div>
                 <div className="login__input-wrapper form__input-wrapper">
                   <label className="visually-hidden">Password</label>
-                  <input className="login__input form__input" type="password" name="password" placeholder="Password" required/>
+                  <input ref={passwordRef} className="login__input form__input" type="password" name="password" placeholder="Password" required/>
+                  {loginFormError ? <p className="login-form-message--error">{loginFormError}</p> : ''}
                 </div>
                 <button className="login__submit form__submit button" type="submit">Sign in</button>
               </form>
@@ -48,4 +94,4 @@ function Login(): JSX.Element {
   );
 }
 
-export default Login;
+export default loginConnector(Login);

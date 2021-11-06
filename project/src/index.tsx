@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import  App  from './components/app/app';
 import { createStore, applyMiddleware } from 'redux';
-import { reducer } from '../src/store/reducer';
+import { rootReducer } from '../src/store/reducer';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import  thunk  from 'redux-thunk';
@@ -13,7 +13,7 @@ import { requireAuthorization } from './store/action';
 
 const api = createApi(() => store.dispatch(requireAuthorization(AuthStatuses.NoAuth)));
 const store = createStore(
-  reducer,
+  rootReducer,
   composeWithDevTools(
     applyMiddleware(thunk.withExtraArgument(api)),
   ));

@@ -5,31 +5,34 @@ import Main from '../main/main';
 import NotFound from '../not-found/not-found';
 import Property from '../property/property';
 import {AppRoutes} from './app.constants';
-import { AuthStatuses } from '../../global.constants';
 import PrivateRoute from '../private-route/private-route';
-import { TState } from '../../types/state';
 import { connect, ConnectedProps } from 'react-redux';
 import Spinner from '../spinner/spinner';
-import { OFFERS } from '../../mocks/offers';
+import { OFFERS_MOCK } from '../../mocks/offers';
 import { Dispatch, useEffect } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
-import { fetchOffersAction } from '../../store/api-actions';
+import { checkUserAuth, fetchOffersAction } from '../../store/api-actions';
+import { TRootState } from '../../store/reducer';
 
 
-const mapStateToProps = ({isDataLoaded}: TState) => ({
-  isDataLoaded,
+const mapStateToProps = ({OFFERS}: TRootState) => ({
+  isDataLoaded: OFFERS.isDataLoaded,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   loadOffers() {
     (dispatch as TThunkActionDispatch)(fetchOffersAction());
   },
+  checkAuthorization() {
+    (dispatch as TThunkActionDispatch)(checkUserAuth());
+  },
 });
 const appConnector = connect(mapStateToProps, mapDispatchToProps);
  type TConnectedAppProps = ConnectedProps<typeof appConnector>;
 
-function App({isDataLoaded, loadOffers}: TConnectedAppProps): JSX.Element {
+function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps): JSX.Element {
   useEffect(() => {
     loadOffers();
+    checkAuthorization();
   }, []);
   if (!isDataLoaded) {
     return(
@@ -47,8 +50,7 @@ function App({isDataLoaded, loadOffers}: TConnectedAppProps): JSX.Element {
         </Route>
         <PrivateRoute
           path={AppRoutes.Favorites}
-          render={() => <Favorite cards={OFFERS}/>}
-          athorizationStatus={AuthStatuses.Auth}
+          render={() => <Favorite cards={OFFERS_MOCK}/>}
           exact
         >
         </PrivateRoute>
