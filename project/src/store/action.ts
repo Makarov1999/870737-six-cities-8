@@ -29,7 +29,6 @@ export const requireLogout = (): TRequireLogoutAction => ({
 export const setAuthInfo = (authInfo: TAuthInfo): TSetAuthInfoAction => ({
   type: ActionType.SetAuthInfo,
   authInfo,
-
 });
 
 

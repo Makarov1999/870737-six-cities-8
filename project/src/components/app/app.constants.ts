@@ -5,3 +5,4 @@ export enum AppRoutes {
   Room = '/offer/:id'
 }
 
+export const ERROR_LOAD_TEXT = 'Произошла ошибка при загрузке данных';

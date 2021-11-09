@@ -8,8 +8,8 @@ type TPrivateRouteProps = RouteProps & {
     render: () => JSX.Element
 };
 
-const mapStateToProps = ({USER}: TRootState) => ({
-  authorizationStatus: USER.authorizationStatus,
+const mapStateToProps = ({ user }: TRootState) => ({
+  authorizationStatus: user.authorizationStatus,
 });
 
 const privateRouteConnector = connect(mapStateToProps);

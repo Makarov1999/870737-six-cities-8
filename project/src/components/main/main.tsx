@@ -18,11 +18,11 @@ import { AppRoutes } from '../app/app.constants';
 import { logoutAction } from '../../store/api-actions';
 import './main.css';
 
-const mapStateToProps = ({OFFERS, USER}: TRootState) => ({
-  activeCity: OFFERS.activeCity,
-  sortOffers: OFFERS.sortOffers,
-  authorizationStatus: USER.authorizationStatus,
-  authInfo: USER.authInfo,
+const mapStateToProps = ({offers, user}: TRootState) => ({
+  activeCity: offers.activeCity,
+  sortOffers: offers.sortOffers,
+  authorizationStatus: user.authorizationStatus,
+  authInfo: user.authInfo,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onCityChange(city: TCity) {
