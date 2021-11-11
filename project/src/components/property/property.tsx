@@ -2,7 +2,7 @@ import Logo from '../logo/logo';
 import CommentForm from '../comment-form/comment-form';
 import { REVIEWS } from '../../mocks/reviews';
 import ReviewList from '../review-list/review-list';
-import { OFFERS } from '../../mocks/offers';
+import { OFFERS_MOCK } from '../../mocks/offers';
 import { AMSTERDAM_CITY } from '../../global.constants';
 import Map from '../map/map';
 import CardPlaceList from '../card-place-list/card-place-list';
@@ -172,13 +172,13 @@ function Property(): JSX.Element {
               </div>
             </div>
             <section className="property__map map">
-              <Map offers={OFFERS} city={AMSTERDAM_CITY} activeOffer={null}/>
+              <Map offers={OFFERS_MOCK} city={AMSTERDAM_CITY} activeOffer={null}/>
             </section>
           </section>
           <div className="container">
             <section className="near-places places">
               <h2 className="near-places__title">Other places in the neighbourhood</h2>
-              <CardPlaceList offers={OFFERS} classNames={classNamesByPage}/>
+              <CardPlaceList offers={OFFERS_MOCK} classNames={classNamesByPage}/>
             </section>
           </div>
         </main>

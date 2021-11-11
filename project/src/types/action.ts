@@ -1,10 +1,11 @@
 import TSortType from './sort-type';
 import { TCity } from './city';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { TState } from '../types/state';
 import { AxiosInstance } from 'axios';
 import TCityPlaceCard from './city-place-card';
 import { AuthStatuses } from '../global.constants';
+import TAuthInfo from './auth-info';
+import { TRootState } from '../store/reducer';
 
 export enum ActionType {
   FillOffersStore = 'offers/fillStore',
@@ -12,6 +13,7 @@ export enum ActionType {
   SortByType = 'offers/sortByType',
   RequireAuthorization = 'user/requireAuthorization',
   RequireLogout = 'user/requireLogout',
+  SetAuthInfo = 'user/setAuthInfo',
 }
 
 export type TFillOffersAction = {
@@ -39,7 +41,13 @@ export type TRequireLogoutAction = {
   type: ActionType.RequireLogout,
 };
 
+export type TSetAuthInfoAction = {
+  type: ActionType.SetAuthInfo,
+  authInfo: TAuthInfo
 
-export type TActions = TFillOffersAction | TChangeCityAction | TSortByTypeAction | TRequireAuthorizationAction | TRequireLogoutAction;
-export type TThunkActionResult<R = Promise<void>> = ThunkAction<R, TState, AxiosInstance, TActions>;
-export type TThunkActionDispatch = ThunkDispatch<TState, AxiosInstance, TActions>;
+}
+
+
+export type TActions = TFillOffersAction | TChangeCityAction | TSortByTypeAction | TRequireAuthorizationAction | TRequireLogoutAction | TSetAuthInfoAction;
+export type TThunkActionResult<R = Promise<void>> = ThunkAction<R, TRootState, AxiosInstance, TActions>;
+export type TThunkActionDispatch = ThunkDispatch<TRootState, AxiosInstance, TActions>;

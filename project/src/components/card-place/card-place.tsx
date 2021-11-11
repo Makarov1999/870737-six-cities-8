@@ -49,7 +49,7 @@ function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, on
         <h2 className="place-card__name">
           <Link to={`/offer/${id}`}>{title}</Link>
         </h2>
-        <p className="place-card__type">{type}</p>
+        <p className="place-card__type">{type.replace(type[0], (letter) => letter.toUpperCase())}</p>
       </div>
     </article>
   );

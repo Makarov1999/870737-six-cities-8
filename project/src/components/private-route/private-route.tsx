@@ -1,17 +1,26 @@
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 import { AuthStatuses } from '../../global.constants';
 import { AppRoutes } from '../app/app.constants';
-type PrivateRouteProps = RouteProps & {
-    render: () => JSX.Element,
-    athorizationStatus: AuthStatuses
+import {connect, ConnectedProps} from 'react-redux';
+import { TRootState } from '../../store/reducer';
 
+type TPrivateRouteProps = RouteProps & {
+    render: () => JSX.Element
 };
-function PrivateRoute(props: PrivateRouteProps): JSX.Element {
-  const {exact, path, render, athorizationStatus} = props;
+
+const mapStateToProps = ({ user }: TRootState) => ({
+  authorizationStatus: user.authorizationStatus,
+});
+
+const privateRouteConnector = connect(mapStateToProps);
+type TPrivateRouteConnectedProps = ConnectedProps<typeof privateRouteConnector> & TPrivateRouteProps;
+
+function PrivateRoute(props: TPrivateRouteConnectedProps): JSX.Element {
+  const {exact, path, render, authorizationStatus} = props;
   return (
     <Route exact={exact} path={path} render={
       () =>
-        (athorizationStatus === AuthStatuses.Auth
+        (authorizationStatus === AuthStatuses.Auth
           ? render()
           : <Redirect to={AppRoutes.SignIn}/>)
     }
@@ -20,4 +29,4 @@ function PrivateRoute(props: PrivateRouteProps): JSX.Element {
   );
 }
 
-export default PrivateRoute;
+export default privateRouteConnector(PrivateRoute);

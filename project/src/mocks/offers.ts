@@ -1,6 +1,6 @@
 import TCityPlaceCard from '../types/city-place-card';
 
-export const OFFERS: TCityPlaceCard[] = [
+export const OFFERS_MOCK: TCityPlaceCard[] = [
   {
     id: 1,
     bedrooms: 3,

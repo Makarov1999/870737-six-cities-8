@@ -1,65 +1,82 @@
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Switch, Route, useHistory } from 'react-router-dom';
 import Favorite  from '../favorite/favorite';
 import Login from '../login/login';
 import Main from '../main/main';
 import NotFound from '../not-found/not-found';
 import Property from '../property/property';
-import {AppRoutes} from './app.constants';
-import { AuthStatuses } from '../../global.constants';
+import { AppRoutes, ERROR_LOAD_TEXT } from './app.constants';
 import PrivateRoute from '../private-route/private-route';
-import { TState } from '../../types/state';
 import { connect, ConnectedProps } from 'react-redux';
 import Spinner from '../spinner/spinner';
-import { OFFERS } from '../../mocks/offers';
-import { Dispatch, useEffect } from 'react';
+import { OFFERS_MOCK } from '../../mocks/offers';
+import { Dispatch, useEffect, useState } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
-import { fetchOffersAction } from '../../store/api-actions';
+import { checkUserAuth, fetchOffersAction } from '../../store/api-actions';
+import { TRootState } from '../../store/reducer';
+import './app.css';
 
 
-const mapStateToProps = ({isDataLoaded}: TState) => ({
-  isDataLoaded,
+const mapStateToProps = ({ offers, user }: TRootState) => ({
+  isDataLoaded: offers.isDataLoaded,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   loadOffers() {
-    (dispatch as TThunkActionDispatch)(fetchOffersAction());
+    return (dispatch as TThunkActionDispatch)(fetchOffersAction());
+  },
+  checkAuthorization() {
+    return (dispatch as TThunkActionDispatch)(checkUserAuth());
   },
 });
 const appConnector = connect(mapStateToProps, mapDispatchToProps);
  type TConnectedAppProps = ConnectedProps<typeof appConnector>;
 
-function App({isDataLoaded, loadOffers}: TConnectedAppProps): JSX.Element {
+function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps): JSX.Element {
+  const [loadError, setErrorLoad] = useState<string>('');
+  const history = useHistory();
+  const onLoadOffersError = () => {
+    setErrorLoad(ERROR_LOAD_TEXT);
+  };
   useEffect(() => {
-    loadOffers();
+    checkAuthorization().catch(() => {
+      history.push(AppRoutes.SignIn);
+    });
+  }, []);
+  useEffect(() => {
+    loadOffers().catch(() => {
+      onLoadOffersError();
+    });
   }, []);
   if (!isDataLoaded) {
     return(
       <Spinner/>
     );
   }
+  if (loadError) {
+    return (
+      <p className="load-error-title">{loadError}</p>
+    );
+  }
   return(
-    <BrowserRouter>
-      <Switch>
-        <Route path={AppRoutes.Main} exact>
-          <Main/>
-        </Route>
-        <Route path={AppRoutes.SignIn} exact>
-          <Login/>
-        </Route>
-        <PrivateRoute
-          path={AppRoutes.Favorites}
-          render={() => <Favorite cards={OFFERS}/>}
-          athorizationStatus={AuthStatuses.Auth}
-          exact
-        >
-        </PrivateRoute>
-        <Route path={AppRoutes.Room} exact>
-          <Property/>
-        </Route>
-        <Route>
-          <NotFound/>
-        </Route>
-      </Switch>
-    </BrowserRouter>
+    <Switch>
+      <Route path={AppRoutes.Main} exact>
+        <Main/>
+      </Route>
+      <Route path={AppRoutes.SignIn} exact>
+        <Login/>
+      </Route>
+      <PrivateRoute
+        path={AppRoutes.Favorites}
+        render={() => <Favorite cards={OFFERS_MOCK}/>}
+        exact
+      >
+      </PrivateRoute>
+      <Route path={AppRoutes.Room} exact>
+        <Property/>
+      </Route>
+      <Route>
+        <NotFound/>
+      </Route>
+    </Switch>
   );
 }
 

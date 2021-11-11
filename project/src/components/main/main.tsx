@@ -1,21 +1,28 @@
 import CardPlaceList from '../card-place-list/card-place-list';
 import TCityPlaceCard from '../../types/city-place-card';
-import {useCallback, useMemo, useState } from 'react';
+import {useCallback, useMemo, useState, MouseEvent } from 'react';
 import { Dispatch } from 'redux';
 import Map from '../map/map';
 import MainEmpty from '../main-empty/main-empty';
 import CityList from '../city-list/city-list';
 import { connect, ConnectedProps } from 'react-redux';
-import { TState } from '../../types/state';
-import { TActions } from '../../types/action';
+import { TActions, TThunkActionDispatch } from '../../types/action';
 import { changeCity, sortByType } from '../../store/action';
 import SortList from '../sort-list/sort-list';
 import { TCity } from '../../types/city';
 import TSortType from '../../types/sort-type';
+import { TRootState } from '../../store/reducer';
+import { AuthStatuses } from '../../global.constants';
+import { Link } from 'react-router-dom';
+import { AppRoutes } from '../app/app.constants';
+import { logoutAction } from '../../store/api-actions';
+import './main.css';
 
-const mapStateToProps = ({activeCity, sortOffers}: TState) => ({
-  activeCity,
-  sortOffers,
+const mapStateToProps = ({offers, user}: TRootState) => ({
+  activeCity: offers.activeCity,
+  sortOffers: offers.sortOffers,
+  authorizationStatus: user.authorizationStatus,
+  authInfo: user.authInfo,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onCityChange(city: TCity) {
@@ -24,16 +31,29 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onSortByType(sortType: TSortType) {
     dispatch(sortByType(sortType));
   },
+  onLogout() {
+    return (dispatch as TThunkActionDispatch)(logoutAction());
+  },
 });
 const mainConnector = connect(mapStateToProps, mapDispatchToProps);
 type TConnectedMainProps = ConnectedProps<typeof mainConnector>;
 function Main({
   activeCity,
   sortOffers,
+  authorizationStatus,
+  authInfo,
   onCityChange,
   onSortByType,
+  onLogout,
 }: TConnectedMainProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
+  const [logoutError, setLogoutError] = useState<string>('');
+  const onLogoutError = () => {
+    setLogoutError('Произошла ошибка при выходе');
+    setTimeout(() => {
+      setLogoutError('');
+    }, 5000);
+  };
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
     card: 'cities__place-card',
@@ -45,6 +65,12 @@ function Main({
   const handlePointerLeave = useCallback(() => {
     setActiveCard(null);
   }, []);
+  const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    onLogout().catch(() => {
+      onLogoutError();
+    });
+  };
   return (
     <>
       <div style={{display: 'none'}}>
@@ -61,18 +87,27 @@ function Main({
               </div>
               <nav className="header__nav">
                 <ul className="header__nav-list">
-                  <li className="header__nav-item user">
-                    <a className="header__nav-link header__nav-link--profile" href="#">
-                      <div className="header__avatar-wrapper user__avatar-wrapper">
-                      </div>
-                      <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                    </a>
-                  </li>
-                  <li className="header__nav-item">
-                    <a className="header__nav-link" href="#">
-                      <span className="header__signout">Sign out</span>
-                    </a>
-                  </li>
+                  {authorizationStatus === AuthStatuses.Auth ?
+                    <>
+                      <li className="header__nav-item user">
+                        <a className="header__nav-link header__nav-link--profile" href="#">
+                          <div className="header__avatar-wrapper user__avatar-wrapper">
+                            <img src={authInfo?.avatarUrl} alt="User Avatar" />
+                          </div>
+                          <span className="header__user-name user__name">{authInfo?.email}</span>
+                        </a>
+                      </li>
+                      <li className="header__nav-item">
+                        <a className="header__nav-link" href="#" onClick={handleLogoutClick}>
+                          <span className="header__signin">Sign out</span>
+                        </a>
+                      </li>
+                    </>:
+                    <li className="header__nav-item">
+                      <Link className="header__nav-link" to={AppRoutes.SignIn}>
+                        <span className="header__signout">Sign in</span>
+                      </Link>
+                    </li>}
                 </ul>
               </nav>
             </div>
@@ -102,6 +137,9 @@ function Main({
                 </div>
               </div>
               : <MainEmpty/>}
+          </div>
+          <div className={`.logout-error-modal ${logoutError ? '.logout-error-modal--active' : ''}`} >
+            <p className="logout-error-modal__text"></p>
           </div>
         </main>
       </div>
