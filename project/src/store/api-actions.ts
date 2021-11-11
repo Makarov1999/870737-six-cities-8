@@ -9,49 +9,32 @@ import { dropToken, setToken } from '../services/token/token';
 import { TAuthData } from '../types/auth-data';
 import TAuthInfo from '../types/auth-info';
 import TAuthInfoApi from '../types/auth-info-api';
-import  browserHistory  from '../browser-history/browser-history';
-import { AppRoutes } from '../components/app/app.constants';
 
-export const fetchOffersAction = (onErrorCallbak: VoidFunction): TThunkActionResult =>
+export const fetchOffersAction = (): TThunkActionResult =>
   async (dispatch, _, api): Promise<void> => {
-    try {
-      const { data } = await api.get<TCityPlaceCardApi[]>(APIRoutes.Offers);
-      const offers = data.map((offer: TCityPlaceCardApi) => adaptToClient<TCityPlaceCardApi, TCityPlaceCard>(offer));
-      dispatch(fillOffersStore(offers));
-    }
-    catch {
-      onErrorCallbak();
-    }
+    const { data } = await api.get<TCityPlaceCardApi[]>(APIRoutes.Offers);
+    const offers = data.map((offer: TCityPlaceCardApi) => adaptToClient<TCityPlaceCardApi, TCityPlaceCard>(offer));
+    dispatch(fillOffersStore(offers));
   };
 export const checkUserAuth = (): TThunkActionResult =>
   async (dispatch, _, api): Promise<void> => {
-    try {
-      const { data } = await api.get(APIRoutes.Login);
-      const authInfo = adaptToClient<TAuthInfoApi, TAuthInfo>(data);
-      setToken(authInfo.token);
-      dispatch(setAuthInfo(authInfo));
-      dispatch(requireAuthorization(AuthStatuses.Auth));
-    }
-    catch {
-      browserHistory.push(AppRoutes.SignIn);
-    }
+    const { data } = await api.get(APIRoutes.Login);
+    const authInfo = adaptToClient<TAuthInfoApi, TAuthInfo>(data);
+    setToken(authInfo.token);
+    dispatch(setAuthInfo(authInfo));
+    dispatch(requireAuthorization(AuthStatuses.Auth));
   };
-export const loginAction = ({email, password}: TAuthData, onErrorCallbak: VoidFunction): TThunkActionResult =>
+export const loginAction = ({email, password}: TAuthData): TThunkActionResult =>
   async (dispatch, _, api): Promise<void> => {
-    try {
-      const { data } = await api.post<TAuthInfoApi>(APIRoutes.Login, {email, password});
-      const authInfo = adaptToClient<TAuthInfoApi, TAuthInfo>(data);
-      setToken(data.token);
-      dispatch(requireAuthorization(AuthStatuses.Auth));
-      dispatch(setAuthInfo(authInfo));
-    }
-    catch {
-      onErrorCallbak();
-    }
+    const { data } = await api.post<TAuthInfoApi>(APIRoutes.Login, {email, password});
+    const authInfo = adaptToClient<TAuthInfoApi, TAuthInfo>(data);
+    setToken(data.token);
+    dispatch(requireAuthorization(AuthStatuses.Auth));
+    dispatch(setAuthInfo(authInfo));
   };
 export const logoutAction = (): TThunkActionResult =>
   async (dispatch, _, api): Promise<void> => {
-    api.delete(APIRoutes.Logout);
+    await api.delete(APIRoutes.Logout);
     dropToken();
     dispatch(requireLogout());
   };

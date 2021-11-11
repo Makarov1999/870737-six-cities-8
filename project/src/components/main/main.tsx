@@ -32,7 +32,7 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
     dispatch(sortByType(sortType));
   },
   onLogout() {
-    (dispatch as TThunkActionDispatch)(logoutAction());
+    return (dispatch as TThunkActionDispatch)(logoutAction());
   },
 });
 const mainConnector = connect(mapStateToProps, mapDispatchToProps);
@@ -47,6 +47,13 @@ function Main({
   onLogout,
 }: TConnectedMainProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const onLogoutError = () => {
+    setLogoutError('Произошла ошибка при выходе');
+    setTimeout(() => {
+      setLogoutError(null);
+    }, 5000);
+  };
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
     card: 'cities__place-card',
@@ -60,7 +67,9 @@ function Main({
   }, []);
   const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    onLogout();
+    onLogout().catch(() => {
+      onLogoutError();
+    });
   };
   return (
     <>
@@ -128,6 +137,9 @@ function Main({
                 </div>
               </div>
               : <MainEmpty/>}
+          </div>
+          <div className={`.logout-error-modal ${logoutError ? '.logout-error-modal--active' : ''}`} >
+            <p className="logout-error-modal__text"></p>
           </div>
         </main>
       </div>

@@ -9,14 +9,15 @@ import { AuthStatuses } from '../../global.constants';
 import { useHistory } from 'react-router';
 import { AppRoutes } from '../app/app.constants';
 import './login.css';
+import { PASSWORD_PATTERN } from './login.constants';
 
 const mapStateToProps = ({ user }: TRootState) => ({
   authorizationStatus: user.authorizationStatus,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
-  onLoginFormSubmit(authData: TAuthData, onErrorCallback: VoidFunction) {
-    (dispatch as TThunkActionDispatch)(loginAction(authData, onErrorCallback));
+  onLoginFormSubmit(authData: TAuthData) {
+    return (dispatch as TThunkActionDispatch)(loginAction(authData));
   },
 });
 const loginConnector = connect(mapStateToProps, mapDispatchToProps);
@@ -44,18 +45,14 @@ function Login({authorizationStatus, onLoginFormSubmit}: TLoginConnectedProps): 
   const handleLoginFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoginFormError(null);
-    const reg = /(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+/g;
     if (email && password) {
-      if (password.match(reg)) {
-        try {
-          onLoginFormSubmit({
-            email,
-            password,
-          }, onLoginError);
-        }
-        catch {
-          setLoginFormError('Произошла ошибка выполнении запроса');
-        }
+      if (password.match(PASSWORD_PATTERN)) {
+        onLoginFormSubmit({
+          email,
+          password,
+        }).catch(() => {
+          onLoginError();
+        });
       } else {
         setLoginFormError('Password must include 1 letter and 1 number at least');
       }

@@ -13,6 +13,7 @@ import { Dispatch, useEffect, useState } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
 import { checkUserAuth, fetchOffersAction } from '../../store/api-actions';
 import { TRootState } from '../../store/reducer';
+import browserHistory from '../../browser-history/browser-history';
 import './app.css';
 
 
@@ -20,11 +21,11 @@ const mapStateToProps = ({ offers, user }: TRootState) => ({
   isDataLoaded: offers.isDataLoaded,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
-  loadOffers(erroCallBack: VoidFunction) {
-    (dispatch as TThunkActionDispatch)(fetchOffersAction(erroCallBack));
+  loadOffers() {
+    return (dispatch as TThunkActionDispatch)(fetchOffersAction());
   },
   checkAuthorization() {
-    (dispatch as TThunkActionDispatch)(checkUserAuth());
+    return (dispatch as TThunkActionDispatch)(checkUserAuth());
   },
 });
 const appConnector = connect(mapStateToProps, mapDispatchToProps);
@@ -35,11 +36,18 @@ function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps)
   const onLoadOffersError = () => {
     setErrorLoad(ERROR_LOAD_TEXT);
   };
+  const onCheckAuthError = () => {
+    browserHistory.push(AppRoutes.SignIn);
+  };
   useEffect(() => {
-    checkAuthorization();
+    checkAuthorization().catch(() => {
+      onCheckAuthError();
+    });
   }, []);
   useEffect(() => {
-    loadOffers(onLoadOffersError);
+    loadOffers().catch(() => {
+      onLoadOffersError();
+    });
   }, []);
   if (!isDataLoaded) {
     return(
