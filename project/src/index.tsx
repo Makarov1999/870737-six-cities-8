@@ -10,6 +10,7 @@ import { createApi } from './services/api/api';
 import 'leaflet/dist/leaflet.css';
 import { AuthStatuses } from './global.constants';
 import { requireAuthorization } from './store/action';
+import { BrowserRouter } from 'react-router-dom';
 
 const api = createApi(() => store.dispatch(requireAuthorization(AuthStatuses.NoAuth)));
 const store = createStore(
@@ -19,8 +20,10 @@ const store = createStore(
   ));
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App/>
-    </Provider>
+    <BrowserRouter>
+      <Provider store={store}>
+        <App/>
+      </Provider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root'));

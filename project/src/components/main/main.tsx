@@ -47,11 +47,11 @@ function Main({
   onLogout,
 }: TConnectedMainProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
-  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [logoutError, setLogoutError] = useState<string>('');
   const onLogoutError = () => {
     setLogoutError('Произошла ошибка при выходе');
     setTimeout(() => {
-      setLogoutError(null);
+      setLogoutError('');
     }, 5000);
   };
   const classNamesByPage = useMemo(() => ({

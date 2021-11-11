@@ -38,13 +38,13 @@ function Login({authorizationStatus, onLoginFormSubmit}: TLoginConnectedProps): 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
-  const [loginFormError, setLoginFormError] = useState<string | null>(null);
+  const [loginFormError, setLoginFormError] = useState<string>('');
   const onLoginError = () => {
     setLoginFormError('Произошла ошибка выполнении запроса');
   };
   const handleLoginFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoginFormError(null);
+    setLoginFormError('');
     if (email && password) {
       if (password.match(PASSWORD_PATTERN)) {
         onLoginFormSubmit({

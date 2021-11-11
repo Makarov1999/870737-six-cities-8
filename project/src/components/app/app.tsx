@@ -1,4 +1,4 @@
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { Switch, Route, useHistory } from 'react-router-dom';
 import Favorite  from '../favorite/favorite';
 import Login from '../login/login';
 import Main from '../main/main';
@@ -13,7 +13,6 @@ import { Dispatch, useEffect, useState } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
 import { checkUserAuth, fetchOffersAction } from '../../store/api-actions';
 import { TRootState } from '../../store/reducer';
-import browserHistory from '../../browser-history/browser-history';
 import './app.css';
 
 
@@ -32,16 +31,17 @@ const appConnector = connect(mapStateToProps, mapDispatchToProps);
  type TConnectedAppProps = ConnectedProps<typeof appConnector>;
 
 function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps): JSX.Element {
-  const [loadError, setErrorLoad] = useState<string | null>(null);
+  const [loadError, setErrorLoad] = useState<string>('');
+  const history = useHistory();
   const onLoadOffersError = () => {
     setErrorLoad(ERROR_LOAD_TEXT);
   };
-  const onCheckAuthError = () => {
-    browserHistory.push(AppRoutes.SignIn);
-  };
+  // const onCheckAuthError = () => {
+  //   history.push(AppRoutes.SignIn);
+  // };
   useEffect(() => {
     checkAuthorization().catch(() => {
-      onCheckAuthError();
+      history.push(AppRoutes.SignIn);
     });
   }, []);
   useEffect(() => {
@@ -60,28 +60,26 @@ function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps)
     );
   }
   return(
-    <BrowserRouter>
-      <Switch>
-        <Route path={AppRoutes.Main} exact>
-          <Main/>
-        </Route>
-        <Route path={AppRoutes.SignIn} exact>
-          <Login/>
-        </Route>
-        <PrivateRoute
-          path={AppRoutes.Favorites}
-          render={() => <Favorite cards={OFFERS_MOCK}/>}
-          exact
-        >
-        </PrivateRoute>
-        <Route path={AppRoutes.Room} exact>
-          <Property/>
-        </Route>
-        <Route>
-          <NotFound/>
-        </Route>
-      </Switch>
-    </BrowserRouter>
+    <Switch>
+      <Route path={AppRoutes.Main} exact>
+        <Main/>
+      </Route>
+      <Route path={AppRoutes.SignIn} exact>
+        <Login/>
+      </Route>
+      <PrivateRoute
+        path={AppRoutes.Favorites}
+        render={() => <Favorite cards={OFFERS_MOCK}/>}
+        exact
+      >
+      </PrivateRoute>
+      <Route path={AppRoutes.Room} exact>
+        <Property/>
+      </Route>
+      <Route>
+        <NotFound/>
+      </Route>
+    </Switch>
   );
 }
 
