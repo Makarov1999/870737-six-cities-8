@@ -36,9 +36,6 @@ function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps)
   const onLoadOffersError = () => {
     setErrorLoad(ERROR_LOAD_TEXT);
   };
-  // const onCheckAuthError = () => {
-  //   history.push(AppRoutes.SignIn);
-  // };
   useEffect(() => {
     checkAuthorization().catch(() => {
       history.push(AppRoutes.SignIn);
