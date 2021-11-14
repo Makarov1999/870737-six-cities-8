@@ -33,6 +33,7 @@ export const OFFERS_MOCK: TCityPlaceCard[] = [
     isFavorite: false,
     isPremiun: true,
     rating: 4,
+    description: ' An independent House, strategically located between Rembrand Square and National Opera, but where the bustle of the city comes to rest in this alley flowery and colorful.',
   },
   {
     id: 2,
@@ -66,6 +67,7 @@ export const OFFERS_MOCK: TCityPlaceCard[] = [
     isFavorite: true,
     isPremiun: false,
     rating: 4,
+    description: ' An independent House, strategically located between Rembrand Square and National Opera, but where the bustle of the city comes to rest in this alley flowery and colorful.',
   },
   {
     id: 3,
@@ -99,6 +101,7 @@ export const OFFERS_MOCK: TCityPlaceCard[] = [
     isFavorite: false,
     isPremiun: false,
     rating: 4,
+    description: ' An independent House, strategically located between Rembrand Square and National Opera, but where the bustle of the city comes to rest in this alley flowery and colorful.',
   },
   {
     id: 4,
@@ -132,6 +135,7 @@ export const OFFERS_MOCK: TCityPlaceCard[] = [
     isFavorite: false,
     isPremiun: true,
     rating: 5,
+    description: ' An independent House, strategically located between Rembrand Square and National Opera, but where the bustle of the city comes to rest in this alley flowery and colorful.',
   },
   {
     id: 5,
@@ -165,5 +169,6 @@ export const OFFERS_MOCK: TCityPlaceCard[] = [
     isFavorite: false,
     isPremiun: true,
     rating: 5,
+    description: ' An independent House, strategically located between Rembrand Square and National Opera, but where the bustle of the city comes to rest in this alley flowery and colorful.',
   },
 ];

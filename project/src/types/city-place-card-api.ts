@@ -23,7 +23,8 @@ type TCityPlaceCardApi = {
   'preview_image': string,
   'is_favorite': boolean,
   'is_premium': boolean,
-  rating: number
+  rating: number,
+  description: string,
 }
 
 export default TCityPlaceCardApi;

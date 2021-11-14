@@ -5,10 +5,10 @@ type TUserApi = {
   name: string
 };
 
-export type TReview = {
+export type TReviewApi = {
   id: number,
   comment: string,
-  date: Date,
+  date: string,
   rating: number,
   user: TUserApi,
 };

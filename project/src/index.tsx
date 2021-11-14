@@ -12,7 +12,7 @@ import { AuthStatuses } from './global.constants';
 import { requireAuthorization } from './store/action';
 import { BrowserRouter } from 'react-router-dom';
 
-const api = createApi(() => store.dispatch(requireAuthorization(AuthStatuses.NoAuth)));
+export const api = createApi(() => store.dispatch(requireAuthorization(AuthStatuses.NoAuth)));
 const store = createStore(
   rootReducer,
   composeWithDevTools(

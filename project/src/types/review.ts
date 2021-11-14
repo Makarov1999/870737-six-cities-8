@@ -7,7 +7,7 @@ type TUser = {
 export type TReview = {
   id: number,
   comment: string,
-  date: Date,
+  date: string,
   rating: number,
   user: TUser,
 };

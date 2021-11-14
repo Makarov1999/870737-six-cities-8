@@ -23,7 +23,7 @@ function Review({review}: TReviewProps): JSX.Element {
           </div>
         </div>
         <p className="reviews__text">{comment}</p>
-        <time className="reviews__time" dateTime={dateToDateTimeStr(date)}>{`${getMonthTextFromDate(date)} ${date.getFullYear()}`}</time>
+        <time className="reviews__time" dateTime={dateToDateTimeStr(date)}>{`${getMonthTextFromDate(date)} ${new Date(date).getFullYear()}`}</time>
       </div>
     </li>
   );
