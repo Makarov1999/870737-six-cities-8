@@ -23,7 +23,8 @@ type TCityPlaceCard = {
     previewImage: string,
     isFavorite: boolean,
     isPremiun: boolean,
-    rating: number
+    rating: number,
+    description: string,
 }
 
 export default TCityPlaceCard;

@@ -1,19 +1,141 @@
 import Logo from '../logo/logo';
 import CommentForm from '../comment-form/comment-form';
-import { REVIEWS } from '../../mocks/reviews';
 import ReviewList from '../review-list/review-list';
-import { OFFERS_MOCK } from '../../mocks/offers';
-import { AMSTERDAM_CITY } from '../../global.constants';
+import { AuthStatuses } from '../../global.constants';
 import Map from '../map/map';
 import CardPlaceList from '../card-place-list/card-place-list';
-import { useMemo } from 'react';
+import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { TRootState } from '../../store/reducer';
+import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
+import { AppRoutes } from '../app/app.constants';
+import { TActions, TThunkActionDispatch } from '../../types/action';
+import { logoutAction } from '../../store/api-actions';
+import { MouseEvent } from 'react';
+import TCityPlaceCard from '../../types/city-place-card';
+import Spinner from '../spinner/spinner';
+import { getOfferById, getOffersNeaby } from '../../services/offer/offer';
+import { COMMENT_LENGTH_MIN, COMMENT_LENGTH_MAX } from './property.constants';
+import { TReview } from '../../types/review';
+import { getReviewsByOfferId, sendCommentByOfferId } from '../../services/review/review';
+import './property.css';
 
-function Property(): JSX.Element {
+const mapStateToProps = ({offers, user}: TRootState) => ({
+  authorizationStatus: user.authorizationStatus,
+  authInfo: user.authInfo,
+  activeCity: offers.activeCity,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+  onLogout() {
+    return (dispatch as TThunkActionDispatch)(logoutAction());
+  },
+});
+
+const propertyConnector = connect(mapStateToProps, mapDispatchToProps);
+type PropertyConnectedProps = ConnectedProps<typeof propertyConnector>
+function Property({authorizationStatus, authInfo, activeCity, onLogout}: PropertyConnectedProps): JSX.Element {
+  const { id } = useParams<{id?: string}>();
+  const history = useHistory();
+  const [offer, setOffer] = useState<TCityPlaceCard | null>(null);
+  const [loadOffersNearbyError, setLoafOffersNearbyError] = useState<string>('');
+  const [offersNearby, setOffersNearby] = useState<TCityPlaceCard[] | null>(null);
+  const [reviewText, setReviewText] = useState<string>('');
+  const [rating, setRating] = useState<number | undefined>(undefined);
+  const [commentFormButtonDisabled, setCommentFormButtonDisabled] = useState<boolean>(false);
+  const [reviews, setReviews] = useState<TReview[] | null>(null);
+  const [reviewsLoadError, setLoadReviewsError] = useState<string>('');
+  const [sendCommentError, setSendCommentError] = useState<string>('');
+  const handleRatingChange = useCallback((rate: number) => {
+    setRating(rate);
+  }, []);
+  const handleCommentTextChange = useCallback((text) => {
+    setReviewText(text);
+  }, []);
+  const onLoadOfferError = () => {
+    history.push(AppRoutes.NotFound);
+  };
+  const onLoadNearbyOffersSuccess = (offersNearbyRes: TCityPlaceCard[]) => {
+    setLoafOffersNearbyError('');
+    setOffersNearby(offersNearbyRes);
+  };
+  const onLoadNearbyOffersError = () => {
+    setLoafOffersNearbyError('Error offers nearby loading');
+  };
+  const onSuccessSendComment = (reviewsRes: TReview[]) => {
+    setRating(undefined);
+    setReviewText('');
+    const sortReviews = reviewsRes.sort((prevReview, nextReview) => (new Date(nextReview.date).getTime() - new Date(prevReview.date).getTime()));
+    setReviews(sortReviews);
+  };
+  const onSuccessReviewLoading = (reviewsRes: TReview[]) => {
+    setLoadReviewsError('');
+    const sortReviews = reviewsRes.sort((prevReview, nextReview) => (new Date(nextReview.date).getTime() - new Date(prevReview.date).getTime()));
+    setReviews(sortReviews);
+  };
+  const onErrorReviewLoading = () => {
+    setLoadReviewsError('Error loading comments');
+  };
+  const onSendCommentError = () => {
+    setSendCommentError('Error on comment sending');
+  };
+  const onSubmitCommentForm = () => {
+    setSendCommentError('');
+    if (id && rating && reviewText) {
+      sendCommentByOfferId(
+        id,
+        {
+          rating,
+          comment: reviewText,
+        })
+        .then(onSuccessSendComment)
+        .catch(onSendCommentError);
+    }
+  };
+  useEffect(() => {
+    if (id) {
+      getOfferById(id)
+        .then(setOffer)
+        .catch(onLoadOfferError);
+      getOffersNeaby(id)
+        .then(onLoadNearbyOffersSuccess)
+        .catch(onLoadNearbyOffersError);
+    }
+  }, [id]);
+  useEffect(() => {
+    if (id) {
+      getReviewsByOfferId(id)
+        .then(onSuccessReviewLoading)
+        .catch(onErrorReviewLoading);
+    }
+  }, [id]);
+  useEffect(() => {
+    if (rating && (reviewText.length >= COMMENT_LENGTH_MIN && reviewText.length <= COMMENT_LENGTH_MAX)) {
+      setCommentFormButtonDisabled(false);
+    } else {
+      setCommentFormButtonDisabled(true);
+    }
+
+  }, [rating, reviewText]);
+
   const classNamesByPage = useMemo(() => ({
     list: 'near-places__list',
     card: 'near-places__card',
     imgWrap: 'near-places__image-wrapper',
   }), []);
+  const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    onLogout();
+  };
+  if (!id) {
+    return <Redirect to={AppRoutes.NotFound}/>;
+  }
+
+  if (!offer) {
+    return (
+      <Spinner/>
+    );
+  }
   return (
     <>
       <div style={{display: 'none'}}>
@@ -28,18 +150,28 @@ function Property(): JSX.Element {
               </div>
               <nav className="header__nav">
                 <ul className="header__nav-list">
-                  <li className="header__nav-item user">
-                    <a className="header__nav-link header__nav-link--profile" href="#">
-                      <div className="header__avatar-wrapper user__avatar-wrapper">
-                      </div>
-                      <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                    </a>
-                  </li>
-                  <li className="header__nav-item">
-                    <a className="header__nav-link" href="#">
-                      <span className="header__signout">Sign out</span>
-                    </a>
-                  </li>
+                  {authorizationStatus === AuthStatuses.Auth ?
+                    <>
+                      <li className="header__nav-item user">
+                        <a className="header__nav-link header__nav-link--profile" href="#">
+                          <div className="header__avatar-wrapper user__avatar-wrapper">
+                            <img src={authInfo?.avatarUrl} alt="User Avatar" />
+                          </div>
+                          <span className="header__user-name user__name">{authInfo?.email}</span>
+                        </a>
+                      </li>
+                      <li className="header__nav-item">
+                        <a className="header__nav-link" href="#" onClick={handleLogoutClick}>
+                          <span className="header__signout">Sign out</span>
+                        </a>
+                      </li>
+                    </>:
+                    <li className="header__nav-item user">
+                      <Link className="header__nav-link header__nav-link--profile" to={AppRoutes.SignIn}>
+                        <div className="header__avatar-wrapper user__avatar-wrapper"></div>
+                        <span className="header__login">Sign in</span>
+                      </Link>
+                    </li>}
                 </ul>
               </nav>
             </div>
@@ -49,36 +181,25 @@ function Property(): JSX.Element {
           <section className="property">
             <div className="property__gallery-container container">
               <div className="property__gallery">
-                <div className="property__image-wrapper">
-                  <img className="property__image" src="img/room.jpg" alt="Photo studio" />
-                </div>
-                <div className="property__image-wrapper">
-                  <img className="property__image" src="img/apartment-01.jpg" alt="Photo studio" />
-                </div>
-                <div className="property__image-wrapper">
-                  <img className="property__image" src="img/apartment-02.jpg" alt="Photo studio" />
-                </div>
-                <div className="property__image-wrapper">
-                  <img className="property__image" src="img/apartment-03.jpg" alt="Photo studio" />
-                </div>
-                <div className="property__image-wrapper">
-                  <img className="property__image" src="img/studio-01.jpg" alt="Photo studio" />
-                </div>
-                <div className="property__image-wrapper">
-                  <img className="property__image" src="img/apartment-01.jpg" alt="Photo studio" />
-                </div>
+                {offer.images.map((image: string) => (
+                  <div className="property__image-wrapper" key={image}>
+                    <img className="property__image" src={image} alt="Photo studio" />
+                  </div>
+                ))}
               </div>
             </div>
             <div className="property__container container">
               <div className="property__wrapper">
-                <div className="property__mark">
-                  <span>Premium</span>
-                </div>
+                {offer.isPremiun ?
+                  <div className="property__mark">
+                    <span>Premium</span>
+                  </div>
+                  : '' }
                 <div className="property__name-wrapper">
                   <h1 className="property__name">
-                Beautiful &amp; luxurious studio at great location
+                    {offer.title}
                   </h1>
-                  <button className="property__bookmark-button button" type="button">
+                  <button className={`property__bookmark-button button ${offer.isFavorite ? 'property__bookmark-button--active' : ''}`} type="button">
                     <svg className="property__bookmark-icon" width={31} height={33}>
                       <use xlinkHref="#icon-bookmark" />
                     </svg>
@@ -87,98 +208,77 @@ function Property(): JSX.Element {
                 </div>
                 <div className="property__rating rating">
                   <div className="property__stars rating__stars">
-                    <span style={{width: '80%'}} />
+                    <span style={{width: `${offer.rating * 20}%`}} />
                     <span className="visually-hidden">Rating</span>
                   </div>
-                  <span className="property__rating-value rating__value">4.8</span>
+                  <span className="property__rating-value rating__value">{offer.rating}</span>
                 </div>
                 <ul className="property__features">
                   <li className="property__feature property__feature--entire">
-                Apartment
+                    {offer.type.replace(offer.type[0], (letter) => letter.toUpperCase())}
                   </li>
                   <li className="property__feature property__feature--bedrooms">
-                3 Bedrooms
+                    {offer.bedrooms} Bedrooms
                   </li>
                   <li className="property__feature property__feature--adults">
-                Max 4 adults
+                Max {offer.maxAdults} adults
                   </li>
                 </ul>
                 <div className="property__price">
-                  <b className="property__price-value">€120</b>
+                  <b className="property__price-value">{offer.price}</b>
                   <span className="property__price-text">&nbsp;night</span>
                 </div>
                 <div className="property__inside">
                   <h2 className="property__inside-title">What s inside</h2>
                   <ul className="property__inside-list">
-                    <li className="property__inside-item">
-                  Wi-Fi
-                    </li>
-                    <li className="property__inside-item">
-                  Washing machine
-                    </li>
-                    <li className="property__inside-item">
-                  Towels
-                    </li>
-                    <li className="property__inside-item">
-                  Heating
-                    </li>
-                    <li className="property__inside-item">
-                  Coffee machine
-                    </li>
-                    <li className="property__inside-item">
-                  Baby seat
-                    </li>
-                    <li className="property__inside-item">
-                  Kitchen
-                    </li>
-                    <li className="property__inside-item">
-                  Dishwasher
-                    </li>
-                    <li className="property__inside-item">
-                  Cabel TV
-                    </li>
-                    <li className="property__inside-item">
-                  Fridge
-                    </li>
+                    {offer.goods.map((good) => (
+                      <li className="property__inside-item" key={good}>
+                        {good}
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div className="property__host">
                   <h2 className="property__host-title">Meet the host</h2>
                   <div className="property__host-user user">
                     <div className="property__avatar-wrapper property__avatar-wrapper--pro user__avatar-wrapper">
-                      <img className="property__avatar user__avatar" src="img/avatar-angelina.jpg" width={74} height={74} alt="Host avatar" />
+                      <img className="property__avatar user__avatar" src={offer.host.avatarUrl} width={74} height={74} alt="Host avatar" />
                     </div>
-                    <span className="property__user-name">
-                  Angelina
-                    </span>
-                    <span className="property__user-status">
-                  Pro
-                    </span>
+                    <span className="property__user-name">{offer.host.name}</span>
+                    {offer.host.isPro ? <span className="property__user-status">Pro</span> : ''}
                   </div>
                   <div className="property__description">
-                    <p className="property__text">
-                  A quiet cozy and picturesque that hides behind a a river by the unique lightness of Amsterdam. The building is green and from 18th century.
-                    </p>
-                    <p className="property__text">
-                  An independent House, strategically located between Rembrand Square and National Opera, but where the bustle of the city comes to rest in this alley flowery and colorful.
-                    </p>
+                    <p className="property__text">{offer.description}</p>
                   </div>
                 </div>
                 <section className="property__reviews reviews">
-                  <h2 className="reviews__title">Reviews · <span className="reviews__amount">{REVIEWS.length}</span></h2>
-                  <ReviewList reviews={REVIEWS}/>
-                  <CommentForm/>
+                  {reviews ?
+                    <>
+                      <h2 className="reviews__title">Reviews · <span className="reviews__amount">{reviews.length}</span></h2>
+                      <ReviewList reviews={reviews.slice(0, 10)} />
+                    </> : <p className="load-error">{reviewsLoadError}</p>}
+                  {authorizationStatus === AuthStatuses.Auth ?
+                    <CommentForm
+                      onRatingChange={handleRatingChange}
+                      onReviewTextChange={handleCommentTextChange}
+                      isCommentFormButtonDisabled={commentFormButtonDisabled}
+                      onSubmitCommentForm={onSubmitCommentForm}
+                      rating={rating}
+                      reviewText={reviewText}
+                    /> : ''}
+                  {sendCommentError ? <p className="load-error">{loadOffersNearbyError}</p> : ''}
                 </section>
               </div>
             </div>
             <section className="property__map map">
-              <Map offers={OFFERS_MOCK} city={AMSTERDAM_CITY} activeOffer={null}/>
+              {offersNearby ? <Map offers={offersNearby} city={activeCity} activeOffer={null}/> : <p className="load-error">{loadOffersNearbyError}</p>}
+
             </section>
           </section>
           <div className="container">
             <section className="near-places places">
               <h2 className="near-places__title">Other places in the neighbourhood</h2>
-              <CardPlaceList offers={OFFERS_MOCK} classNames={classNamesByPage}/>
+              {offersNearby ?  <CardPlaceList offers={offersNearby} classNames={classNamesByPage} /> : <p className="load-error">{loadOffersNearbyError}</p>}
             </section>
           </div>
         </main>
@@ -186,4 +286,6 @@ function Property(): JSX.Element {
     </>
   );
 }
-export default Property;
+export default propertyConnector(Property);
+
+
