@@ -5,7 +5,7 @@ type TCommentFormProps = {
   onRatingChange: (value: number) => void,
   isCommentFormButtonDisabled: boolean,
   onSubmitCommentForm: VoidFunction,
-  rating: number | null,
+  rating?: number,
   reviewText: string,
 };
 function CommentForm({onReviewTextChange, onRatingChange, onSubmitCommentForm, isCommentFormButtonDisabled, rating, reviewText}: TCommentFormProps): JSX.Element {

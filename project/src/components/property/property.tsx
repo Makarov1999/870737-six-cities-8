@@ -7,7 +7,7 @@ import CardPlaceList from '../card-place-list/card-place-list';
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { TRootState } from '../../store/reducer';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
 import { TActions, TThunkActionDispatch } from '../../types/action';
 import { logoutAction } from '../../store/api-actions';
@@ -35,13 +35,13 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
 const propertyConnector = connect(mapStateToProps, mapDispatchToProps);
 type PropertyConnectedProps = ConnectedProps<typeof propertyConnector>
 function Property({authorizationStatus, authInfo, activeCity, onLogout}: PropertyConnectedProps): JSX.Element {
-  const { id } = useParams<{id: string | undefined}>();
+  const { id } = useParams<{id?: string}>();
   const history = useHistory();
   const [offer, setOffer] = useState<TCityPlaceCard | null>(null);
   const [loadOffersNearbyError, setLoafOffersNearbyError] = useState<string>('');
   const [offersNearby, setOffersNearby] = useState<TCityPlaceCard[] | null>(null);
   const [reviewText, setReviewText] = useState<string>('');
-  const [rating, setRating] = useState<number | null>(null);
+  const [rating, setRating] = useState<number | undefined>(undefined);
   const [commentFormButtonDisabled, setCommentFormButtonDisabled] = useState<boolean>(false);
   const [reviews, setReviews] = useState<TReview[] | null>(null);
   const [reviewsLoadError, setLoadReviewsError] = useState<string>('');
@@ -52,9 +52,6 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
   const handleCommentTextChange = useCallback((text) => {
     setReviewText(text);
   }, []);
-  const onOfferLoadSuccess = (offerRes: TCityPlaceCard) => {
-    setOffer(offerRes);
-  };
   const onLoadOfferError = () => {
     history.push(AppRoutes.NotFound);
   };
@@ -66,7 +63,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
     setLoafOffersNearbyError('Error offers nearby loading');
   };
   const onSuccessSendComment = (reviewsRes: TReview[]) => {
-    setRating(null);
+    setRating(undefined);
     setReviewText('');
     const sortReviews = reviewsRes.sort((prevReview, nextReview) => (new Date(nextReview.date).getTime() - new Date(prevReview.date).getTime()));
     setReviews(sortReviews);
@@ -90,20 +87,26 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
         {
           rating,
           comment: reviewText,
-        },
-        onSuccessSendComment,
-        onSendCommentError);
+        })
+        .then(onSuccessSendComment)
+        .catch(onSendCommentError);
     }
   };
   useEffect(() => {
     if (id) {
-      getOfferById(id, onOfferLoadSuccess, onLoadOfferError);
-      getOffersNeaby(id, onLoadNearbyOffersSuccess, onLoadNearbyOffersError);
+      getOfferById(id)
+        .then(setOffer)
+        .catch(onLoadOfferError);
+      getOffersNeaby(id)
+        .then(onLoadNearbyOffersSuccess)
+        .catch(onLoadNearbyOffersError);
     }
   }, [id]);
   useEffect(() => {
     if (id) {
-      getReviewsByOfferId(id, onSuccessReviewLoading, onErrorReviewLoading);
+      getReviewsByOfferId(id)
+        .then(onSuccessReviewLoading)
+        .catch(onErrorReviewLoading);
     }
   }, [id]);
   useEffect(() => {
@@ -124,6 +127,10 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
     e.preventDefault();
     onLogout();
   };
+  if (!id) {
+    return <Redirect to={AppRoutes.NotFound}/>;
+  }
+
   if (!offer) {
     return (
       <Spinner/>
