@@ -10,7 +10,7 @@ import { TRootState } from '../../store/reducer';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
 import { TActions, TThunkActionDispatch } from '../../types/action';
-import { logoutAction } from '../../store/api-actions';
+import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
 import { MouseEvent } from 'react';
 import TCityPlaceCard from '../../types/city-place-card';
 import Spinner from '../spinner/spinner';
@@ -30,11 +30,14 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onLogout() {
     return (dispatch as TThunkActionDispatch)(logoutAction());
   },
+  onFavoriteStatusChange(offerId: number, isFavorite: boolean) {
+    return (dispatch as TThunkActionDispatch)(changeFavoriteStatusFromOffer(offerId, isFavorite));
+  },
 });
 
 const propertyConnector = connect(mapStateToProps, mapDispatchToProps);
 type PropertyConnectedProps = ConnectedProps<typeof propertyConnector>
-function Property({authorizationStatus, authInfo, activeCity, onLogout}: PropertyConnectedProps): JSX.Element {
+function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavoriteStatusChange}: PropertyConnectedProps): JSX.Element {
   const { id } = useParams<{id?: string}>();
   const history = useHistory();
   const [offer, setOffer] = useState<TCityPlaceCard | null>(null);
@@ -52,6 +55,36 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
   const handleCommentTextChange = useCallback((text) => {
     setReviewText(text);
   }, []);
+  const handleFavoriteClick = useCallback((offerId: number, isFavorite: boolean) => {
+    onFavoriteStatusChange(offerId, isFavorite).then(() => {
+      if (id && authorizationStatus === AuthStatuses.Auth) {
+        getOffersNeaby(id)
+          .then(onLoadNearbyOffersSuccess)
+          .catch(onLoadNearbyOffersError);
+      } else {
+        history.push(AppRoutes.SignIn);
+      }
+    });
+  }, []);
+  const handlePropertyButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (id && offer && authorizationStatus === AuthStatuses.Auth) {
+      onFavoriteStatusChange(+id, offer.isFavorite)
+        .then(() => {
+          setOffer(
+            {
+              ...offer,
+              isFavorite: !offer.isFavorite,
+            },
+          );
+        })
+        .catch((err) => {
+          throw new Error(err);
+        });
+    } else {
+      history.push(AppRoutes.SignIn);
+    }
+  };
   const onLoadOfferError = () => {
     history.push(AppRoutes.NotFound);
   };
@@ -153,12 +186,12 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
                   {authorizationStatus === AuthStatuses.Auth ?
                     <>
                       <li className="header__nav-item user">
-                        <a className="header__nav-link header__nav-link--profile" href="#">
+                        <Link className="header__nav-link header__nav-link--profile" to={AppRoutes.Favorites}>
                           <div className="header__avatar-wrapper user__avatar-wrapper">
                             <img src={authInfo?.avatarUrl} alt="User Avatar" />
                           </div>
                           <span className="header__user-name user__name">{authInfo?.email}</span>
-                        </a>
+                        </Link>
                       </li>
                       <li className="header__nav-item">
                         <a className="header__nav-link" href="#" onClick={handleLogoutClick}>
@@ -199,7 +232,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
                   <h1 className="property__name">
                     {offer.title}
                   </h1>
-                  <button className={`property__bookmark-button button ${offer.isFavorite ? 'property__bookmark-button--active' : ''}`} type="button">
+                  <button className={`property__bookmark-button button ${offer.isFavorite ? 'property__bookmark-button--active' : ''}`} type="button" onClick={handlePropertyButtonClick}>
                     <svg className="property__bookmark-icon" width={31} height={33}>
                       <use xlinkHref="#icon-bookmark" />
                     </svg>
@@ -278,7 +311,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
           <div className="container">
             <section className="near-places places">
               <h2 className="near-places__title">Other places in the neighbourhood</h2>
-              {offersNearby ?  <CardPlaceList offers={offersNearby} classNames={classNamesByPage} /> : <p className="load-error">{loadOffersNearbyError}</p>}
+              {offersNearby ?  <CardPlaceList offers={offersNearby} classNames={classNamesByPage} handleFavoriteClick={handleFavoriteClick}/> : <p className="load-error">{loadOffersNearbyError}</p>}
             </section>
           </div>
         </main>

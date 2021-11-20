@@ -1,6 +1,6 @@
 import { APIRoutes } from '../services/api/api.constants';
 import { TThunkActionResult } from '../types/action';
-import { fillOffersStore, requireAuthorization, requireLogout, setAuthInfo } from './action';
+import { changeOfferFavoriteStatus, fillOffersStore, requireAuthorization, requireLogout, setAuthInfo } from './action';
 import { adaptToClient } from '../adapters/adapt-to-client';
 import TCityPlaceCardApi from '../types/city-place-card-api';
 import TCityPlaceCard from '../types/city-place-card';
@@ -37,5 +37,11 @@ export const logoutAction = (): TThunkActionResult =>
     await api.delete(APIRoutes.Logout);
     dropToken();
     dispatch(requireLogout());
+  };
+
+export const changeFavoriteStatusFromOffer = (offerId: number, status: boolean): TThunkActionResult =>
+  async (dispatch, _, api): Promise<void> => {
+    await api.post(`${APIRoutes.Favorite}/${offerId}/${+!status}`);
+    dispatch(changeOfferFavoriteStatus(offerId, !status));
   };
 

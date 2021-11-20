@@ -8,7 +8,6 @@ import { AppRoutes, ERROR_LOAD_TEXT } from './app.constants';
 import PrivateRoute from '../private-route/private-route';
 import { connect, ConnectedProps } from 'react-redux';
 import Spinner from '../spinner/spinner';
-import { OFFERS_MOCK } from '../../mocks/offers';
 import { Dispatch, useEffect, useState } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
 import { checkUserAuth, fetchOffersAction } from '../../store/api-actions';
@@ -66,7 +65,7 @@ function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps)
       </Route>
       <PrivateRoute
         path={AppRoutes.Favorites}
-        render={() => <Favorite cards={OFFERS_MOCK}/>}
+        render={() => <Favorite/>}
         exact
       >
       </PrivateRoute>

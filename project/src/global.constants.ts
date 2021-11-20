@@ -1,4 +1,5 @@
 import { TCity } from './types/city';
+import TSortType from './types/sort-type';
 
 export const AMSTERDAM_CITY: TCity = {
   id: 1,
@@ -9,6 +10,8 @@ export const AMSTERDAM_CITY: TCity = {
     zoom: 12,
   },
 };
+
+export const DEFAULT_SORT_TYPE: TSortType = 'Popular';
 
 const MONTHS_NAMES: string[] = [
   'January',
@@ -97,6 +100,8 @@ export const CITIES: TCity[] = [
     },
   },
 ];
+
+export const CITIES_NAMES = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'];
 
 export enum AuthStatuses {
   Auth = 'AUTH',
