@@ -12,6 +12,7 @@ export enum ActionType {
   ChangeCity = 'offers/changeCity',
   SortByType = 'offers/sortByType',
   ChangeOfferFavoriteStatus = 'offers/changeStatus',
+  UnfavoriteAllOffers = 'offers/unfavoriteAll',
   RequireAuthorization = 'user/requireAuthorization',
   RequireLogout = 'user/requireLogout',
   SetAuthInfo = 'user/setAuthInfo',
@@ -53,7 +54,11 @@ export type TChangeOfferFavoriteStatus = {
   status: boolean,
 }
 
+export type TUnfavoriteAllOffers = {
+  type: ActionType.UnfavoriteAllOffers,
+};
 
-export type TActions = TFillOffersAction | TChangeCityAction | TSortByTypeAction | TRequireAuthorizationAction | TRequireLogoutAction | TSetAuthInfoAction | TChangeOfferFavoriteStatus;
+
+export type TActions = TFillOffersAction | TChangeCityAction | TSortByTypeAction | TRequireAuthorizationAction | TRequireLogoutAction | TSetAuthInfoAction | TChangeOfferFavoriteStatus | TUnfavoriteAllOffers;
 export type TThunkActionResult<R = Promise<void>> = ThunkAction<R, TRootState, AxiosInstance, TActions>;
 export type TThunkActionDispatch = ThunkDispatch<TRootState, AxiosInstance, TActions>;

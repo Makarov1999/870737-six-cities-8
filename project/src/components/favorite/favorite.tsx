@@ -11,6 +11,9 @@ import Spinner from '../spinner/spinner';
 import { getFavoriteOffers } from '../../services/favorite/favorite';
 import { CITIES_NAMES } from '../../global.constants';
 import { MouseEvent } from 'react';
+import ErrorModal from '../error-modal/error-modal';
+import { ERROR_LOGOUT } from '../../global.constants';
+import { FavoritePageErrors } from './favorite.constants';
 
 
 const mapStateToProps = ({ user }: TRootState) => ({
@@ -32,18 +35,27 @@ type TFavoriteConnectedProps = ConnectedProps<typeof favoriteConnector>;
 
 function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConnectedProps): JSX.Element {
   const [favoriteOffers, setFavoriteOffers] = useState<TCityPlaceCard[] | null>();
+  const [errorModalText, setErrorModalText] = useState<string>('');
+  const onLoadFavoriteOffersError = () => {
+    setErrorModalText(FavoritePageErrors.LoadFavoriteOffers);
+  };
   useEffect(() =>{
     getFavoriteOffers()
       .then(setFavoriteOffers)
-      .catch((err) => {
-        throw new Error(err);
-      });
+      .catch(onLoadFavoriteOffersError);
 
   }, []);
   const handleLogoutClick = () => {
-    onLogout().catch((err) => {
-      throw new Error(err);
-    });
+    onLogout().catch(onLogoutError);
+  };
+  const closeErrorModal = () => {
+    setErrorModalText('');
+  };
+  const onLogoutError = () => {
+    setErrorModalText(ERROR_LOGOUT);
+  };
+  const onRemoveOfferFromFavoritesError = () => {
+    setErrorModalText(FavoritePageErrors.RemoveFromFavorite);
   };
   const removeOfferFromFavorite = (offerId: number) => {
     const newFavoriteOffers = favoriteOffers?.filter((favoriteOffer) => favoriteOffer.id !== offerId);
@@ -54,9 +66,7 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
       .then(() => {
         removeOfferFromFavorite(offerId);
       })
-      .catch((err) => {
-        throw new Error(err);
-      });
+      .catch(onRemoveOfferFromFavoritesError);
   };
   if (!favoriteOffers) {
     return <Spinner/>;
@@ -173,6 +183,7 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
                 </div>
               </section>}
           </div>
+          <ErrorModal modalErrorText={errorModalText} onCloseModal={closeErrorModal}/>
         </main>
         <footer className="footer container">
           <Link className="footer__logo-link" to={AppRoutes.Main}>

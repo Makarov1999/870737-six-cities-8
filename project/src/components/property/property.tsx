@@ -1,7 +1,7 @@
 import Logo from '../logo/logo';
 import CommentForm from '../comment-form/comment-form';
 import ReviewList from '../review-list/review-list';
-import { AuthStatuses } from '../../global.constants';
+import { AuthStatuses, ERROR_FAVORITE_STATUS_CHANGE } from '../../global.constants';
 import Map from '../map/map';
 import CardPlaceList from '../card-place-list/card-place-list';
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react';
@@ -19,6 +19,7 @@ import { COMMENT_LENGTH_MIN, COMMENT_LENGTH_MAX } from './property.constants';
 import { TReview } from '../../types/review';
 import { getReviewsByOfferId, sendCommentByOfferId } from '../../services/review/review';
 import './property.css';
+import ErrorModal from '../error-modal/error-modal';
 
 const mapStateToProps = ({offers, user}: TRootState) => ({
   authorizationStatus: user.authorizationStatus,
@@ -49,6 +50,13 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
   const [reviews, setReviews] = useState<TReview[] | null>(null);
   const [reviewsLoadError, setLoadReviewsError] = useState<string>('');
   const [sendCommentError, setSendCommentError] = useState<string>('');
+  const [changeIsFavoriteError, setChangeFavoriteError] = useState<string>('');
+  const closeErrorModal = () => {
+    setChangeFavoriteError('');
+  };
+  const onChangeFavoriteError = () => {
+    setChangeFavoriteError(ERROR_FAVORITE_STATUS_CHANGE);
+  };
   const handleRatingChange = useCallback((rate: number) => {
     setRating(rate);
   }, []);
@@ -71,16 +79,17 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
     if (id && offer && authorizationStatus === AuthStatuses.Auth) {
       onFavoriteStatusChange(+id, offer.isFavorite)
         .then(() => {
-          setOffer(
-            {
-              ...offer,
-              isFavorite: !offer.isFavorite,
-            },
-          );
+          setOffer((prevOffer) => {
+            if (prevOffer) {
+              return {
+                ...prevOffer,
+                isFavorite: !prevOffer.isFavorite,
+              };
+            }
+            return null;
+          });
         })
-        .catch((err) => {
-          throw new Error(err);
-        });
+        .catch(onChangeFavoriteError);
     } else {
       history.push(AppRoutes.SignIn);
     }
@@ -315,6 +324,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
             </section>
           </div>
         </main>
+        <ErrorModal modalErrorText={changeIsFavoriteError} onCloseModal={closeErrorModal}/>
       </div>
     </>
   );

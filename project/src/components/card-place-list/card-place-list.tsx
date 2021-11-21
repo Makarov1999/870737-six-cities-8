@@ -7,7 +7,7 @@ type TCardPlaceListProps = {
     classNames: TCardPlaceListClassNames,
     handlePointerOver?: (offer: TCityPlaceCard) => void ,
     handlePointerLeave?: () => void,
-    handleFavoriteClick: (offerId: number, favoriteStatus: boolean) => void,
+    handleFavoriteClick: (offerId: number, isFavorite: boolean) => void,
 };
 function CardPlaceList({offers, classNames, handlePointerOver, handlePointerLeave, handleFavoriteClick}: TCardPlaceListProps): JSX.Element {
   return (

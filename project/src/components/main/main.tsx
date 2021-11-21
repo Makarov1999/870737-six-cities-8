@@ -12,12 +12,12 @@ import SortList from '../sort-list/sort-list';
 import { TCity } from '../../types/city';
 import TSortType from '../../types/sort-type';
 import { TRootState } from '../../store/reducer';
-import { AuthStatuses } from '../../global.constants';
+import { AuthStatuses, ERROR_FAVORITE_STATUS_CHANGE, ERROR_LOGOUT } from '../../global.constants';
 import { Link, useHistory } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
 import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
 import { getOffersResult } from '../../store/selectors/offer-selector';
-import './main.css';
+import ErrorModal from '../error-modal/error-modal';
 
 const mapStateToProps = ({offers, user}: TRootState) => ({
   activeCity: offers.activeCity,
@@ -52,13 +52,16 @@ function Main({
   onFavoriteStatusChange,
 }: TConnectedMainProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
-  const [logoutError, setLogoutError] = useState<string>('');
+  const [errorText, setErrorText] = useState<string>('');
   const history = useHistory();
   const onLogoutError = () => {
-    setLogoutError('Произошла ошибка при выходе');
-    setTimeout(() => {
-      setLogoutError('');
-    }, 5000);
+    setErrorText(ERROR_LOGOUT);
+  };
+  const closeErrorModal = () => {
+    setErrorText('');
+  };
+  const onFavoriteStatusChangeError = () => {
+    setErrorText(ERROR_FAVORITE_STATUS_CHANGE);
   };
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
@@ -73,9 +76,7 @@ function Main({
   }, []);
   const handleFavoriteClick = useCallback((offerId: number, isFavorite: boolean) => {
     if (authorizationStatus === AuthStatuses.Auth) {
-      onFavoriteStatusChange(offerId, isFavorite).catch((err) => {
-        throw new Error(err);
-      });
+      onFavoriteStatusChange(offerId, isFavorite).catch(onFavoriteStatusChangeError);
     } else {
       history.push(AppRoutes.SignIn);
     }
@@ -155,9 +156,7 @@ function Main({
               </div>
               : <MainEmpty/>}
           </div>
-          <div className={`.logout-error-modal ${logoutError ? '.logout-error-modal--active' : ''}`} >
-            <p className="logout-error-modal__text"></p>
-          </div>
+          <ErrorModal modalErrorText={errorText} onCloseModal={closeErrorModal}/>
         </main>
       </div>
     </>

@@ -1,5 +1,5 @@
 import { AuthStatuses } from '../global.constants';
-import { ActionType, TChangeCityAction, TChangeOfferFavoriteStatus, TFillOffersAction, TRequireAuthorizationAction, TRequireLogoutAction, TSetAuthInfoAction, TSortByTypeAction } from '../types/action';
+import { ActionType, TChangeCityAction, TChangeOfferFavoriteStatus, TFillOffersAction, TRequireAuthorizationAction, TRequireLogoutAction, TSetAuthInfoAction, TSortByTypeAction, TUnfavoriteAllOffers } from '../types/action';
 import TAuthInfo from '../types/auth-info';
 import { TCity } from '../types/city';
 import TCityPlaceCard from '../types/city-place-card';
@@ -35,6 +35,10 @@ export const changeOfferFavoriteStatus = (offerId: number, status: boolean): TCh
   type: ActionType.ChangeOfferFavoriteStatus,
   offerId,
   status,
+});
+
+export const unfavoriteAllOffers = (): TUnfavoriteAllOffers => ({
+  type: ActionType.UnfavoriteAllOffers,
 });
 
 

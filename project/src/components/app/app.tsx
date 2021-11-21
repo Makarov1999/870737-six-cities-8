@@ -17,6 +17,7 @@ import './app.css';
 
 const mapStateToProps = ({ offers, user }: TRootState) => ({
   isDataLoaded: offers.isDataLoaded,
+  authorizationStatus: user.authorizationStatus,
 });
 const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   loadOffers() {
@@ -29,7 +30,7 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
 const appConnector = connect(mapStateToProps, mapDispatchToProps);
  type TConnectedAppProps = ConnectedProps<typeof appConnector>;
 
-function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps): JSX.Element {
+function App({isDataLoaded, loadOffers, checkAuthorization, authorizationStatus}: TConnectedAppProps): JSX.Element {
   const [loadError, setErrorLoad] = useState<string>('');
   const history = useHistory();
   const onLoadOffersError = () => {
@@ -39,7 +40,7 @@ function App({isDataLoaded, loadOffers, checkAuthorization}: TConnectedAppProps)
     checkAuthorization().catch(() => {
       history.push(AppRoutes.SignIn);
     });
-  }, []);
+  }, [authorizationStatus]);
   useEffect(() => {
     loadOffers().catch(() => {
       onLoadOffersError();

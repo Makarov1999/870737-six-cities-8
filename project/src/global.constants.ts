@@ -1,16 +1,8 @@
 import { TCity } from './types/city';
 import TSortType from './types/sort-type';
 
-export const AMSTERDAM_CITY: TCity = {
-  id: 1,
-  title: 'Amsterdam',
-  location: {
-    latitude: 52.3909553943508,
-    longitude: 4.85309666406198,
-    zoom: 12,
-  },
-};
-
+export const ERROR_LOGOUT = 'Error while logout action';
+export const ERROR_FAVORITE_STATUS_CHANGE = 'Error while favorite status change';
 export const DEFAULT_SORT_TYPE: TSortType = 'Popular';
 
 const MONTHS_NAMES: string[] = [

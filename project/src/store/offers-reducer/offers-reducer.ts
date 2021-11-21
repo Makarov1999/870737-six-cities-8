@@ -35,9 +35,14 @@ export const offersReducer = (state: TOffersState = initialState, action: TActio
       };
     }
     case ActionType.ChangeOfferFavoriteStatus: {
-      const offers = state.offers.slice();
-      const offersIndex = offers.findIndex((offer) => (offer.id === action.offerId));
-      offers[offersIndex].isFavorite = action.status;
+      const offers = state.offers.map((offer) => (offer.id === action.offerId) ? {...offer, isFavorite: action.status} : offer);
+      return {
+        ...state,
+        offers,
+      };
+    }
+    case ActionType.UnfavoriteAllOffers: {
+      const offers = state.offers.map((offer) => ({...offer, isFavorite: false}));
       return {
         ...state,
         offers,

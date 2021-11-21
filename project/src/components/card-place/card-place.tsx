@@ -7,7 +7,7 @@ type TCardPlaceProps = {
   cardClassName: string,
   onPointerOverCard?: (card: TCityPlaceCard) => void,
   onPointerLeaveCard?: () => void,
-  onFavoriteClick: (offerId: number, favoriteStatus: boolean) => void,
+  onFavoriteClick: (offerId: number, isFavorite: boolean) => void,
 };
 
 function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, onPointerLeaveCard, onFavoriteClick}: TCardPlaceProps): JSX.Element {
