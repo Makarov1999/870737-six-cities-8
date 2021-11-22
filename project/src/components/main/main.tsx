@@ -13,14 +13,15 @@ import { TCity } from '../../types/city';
 import TSortType from '../../types/sort-type';
 import { TRootState } from '../../store/reducer';
 import { AuthStatuses } from '../../global.constants';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
-import { logoutAction } from '../../store/api-actions';
-import './main.css';
+import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
+import { getOffersResult } from '../../store/selectors/offer-selector';
+import ErrorModal from '../error-modal/error-modal';
 
 const mapStateToProps = ({offers, user}: TRootState) => ({
   activeCity: offers.activeCity,
-  sortOffers: offers.sortOffers,
+  offers: getOffersResult(offers),
   authorizationStatus: user.authorizationStatus,
   authInfo: user.authInfo,
 });
@@ -34,25 +35,33 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onLogout() {
     return (dispatch as TThunkActionDispatch)(logoutAction());
   },
+  onFavoriteStatusChange(offerId: number, isFavorite: boolean) {
+    return (dispatch as TThunkActionDispatch)(changeFavoriteStatusFromOffer(offerId, isFavorite));
+  },
 });
 const mainConnector = connect(mapStateToProps, mapDispatchToProps);
 type TConnectedMainProps = ConnectedProps<typeof mainConnector>;
 function Main({
   activeCity,
-  sortOffers,
+  offers,
   authorizationStatus,
   authInfo,
   onCityChange,
   onSortByType,
   onLogout,
+  onFavoriteStatusChange,
 }: TConnectedMainProps): JSX.Element {
   const [activeCard, setActiveCard] = useState<null | TCityPlaceCard>(null);
-  const [logoutError, setLogoutError] = useState<string>('');
+  const [errorText, setErrorText] = useState<string>('');
+  const history = useHistory();
   const onLogoutError = () => {
-    setLogoutError('Произошла ошибка при выходе');
-    setTimeout(() => {
-      setLogoutError('');
-    }, 5000);
+    setErrorText('Error while logout action');
+  };
+  const closeErrorModal = () => {
+    setErrorText('');
+  };
+  const onFavoriteStatusChangeError = () => {
+    setErrorText('Error while favorite status change');
   };
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
@@ -65,6 +74,14 @@ function Main({
   const handlePointerLeave = useCallback(() => {
     setActiveCard(null);
   }, []);
+  const handleFavoriteClick = useCallback((offerId: number, isFavorite: boolean) => {
+    if (authorizationStatus === AuthStatuses.Auth) {
+      onFavoriteStatusChange(offerId, isFavorite).catch(onFavoriteStatusChangeError);
+    } else {
+      history.push(AppRoutes.SignIn);
+    }
+
+  }, [authorizationStatus, history, onFavoriteStatusChange]);
   const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     onLogout().catch(() => {
@@ -90,12 +107,12 @@ function Main({
                   {authorizationStatus === AuthStatuses.Auth ?
                     <>
                       <li className="header__nav-item user">
-                        <a className="header__nav-link header__nav-link--profile" href="#">
+                        <Link className="header__nav-link header__nav-link--profile" to={AppRoutes.Favorites}>
                           <div className="header__avatar-wrapper user__avatar-wrapper">
                             <img src={authInfo?.avatarUrl} alt="User Avatar" />
                           </div>
                           <span className="header__user-name user__name">{authInfo?.email}</span>
-                        </a>
+                        </Link>
                       </li>
                       <li className="header__nav-item">
                         <a className="header__nav-link" href="#" onClick={handleLogoutClick}>
@@ -114,7 +131,7 @@ function Main({
             </div>
           </div>
         </header>
-        <main className={`page__main page__main--index ${sortOffers.length === 0 ? 'page__main--index-empty' : ''}` }>
+        <main className={`page__main page__main--index ${offers.length === 0 ? 'page__main--index-empty' : ''}` }>
           <h1 className="visually-hidden">Cities</h1>
           <div className="tabs">
             <section className="locations container">
@@ -122,26 +139,24 @@ function Main({
             </section>
           </div>
           <div className="cities">
-            {sortOffers.length > 0
+            {offers.length > 0
               ?
               <div className="cities__places-container container">
                 <section className="cities__places places">
                   <h2 className="visually-hidden">Places</h2>
-                  <b className="places__found">{`${sortOffers.length} places to stay in ${activeCity.title}`}</b>
+                  <b className="places__found">{`${offers.length} places to stay in ${activeCity.title}`}</b>
                   <SortList onSortByType={onSortByType}/>
-                  <CardPlaceList offers={sortOffers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave}/>
+                  <CardPlaceList offers={offers} classNames={classNamesByPage} handlePointerOver={handlePointerOver} handlePointerLeave={handlePointerLeave} handleFavoriteClick={handleFavoriteClick}/>
                 </section>
                 <div className="cities__right-section">
                   <section className="cities__map map">
-                    <Map offers={sortOffers} city={activeCity} activeOffer={activeCard}/>
+                    <Map offers={offers} city={activeCity} activeOffer={activeCard}/>
                   </section>
                 </div>
               </div>
               : <MainEmpty/>}
           </div>
-          <div className={`.logout-error-modal ${logoutError ? '.logout-error-modal--active' : ''}`} >
-            <p className="logout-error-modal__text"></p>
-          </div>
+          <ErrorModal modalErrorText={errorText} onCloseModal={closeErrorModal}/>
         </main>
       </div>
     </>

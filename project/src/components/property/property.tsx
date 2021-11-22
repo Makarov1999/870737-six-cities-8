@@ -10,7 +10,7 @@ import { TRootState } from '../../store/reducer';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
 import { TActions, TThunkActionDispatch } from '../../types/action';
-import { logoutAction } from '../../store/api-actions';
+import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
 import { MouseEvent } from 'react';
 import TCityPlaceCard from '../../types/city-place-card';
 import Spinner from '../spinner/spinner';
@@ -19,6 +19,7 @@ import { COMMENT_LENGTH_MIN, COMMENT_LENGTH_MAX } from './property.constants';
 import { TReview } from '../../types/review';
 import { getReviewsByOfferId, sendCommentByOfferId } from '../../services/review/review';
 import './property.css';
+import ErrorModal from '../error-modal/error-modal';
 
 const mapStateToProps = ({offers, user}: TRootState) => ({
   authorizationStatus: user.authorizationStatus,
@@ -30,11 +31,14 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
   onLogout() {
     return (dispatch as TThunkActionDispatch)(logoutAction());
   },
+  onFavoriteStatusChange(offerId: number, isFavorite: boolean) {
+    return (dispatch as TThunkActionDispatch)(changeFavoriteStatusFromOffer(offerId, isFavorite));
+  },
 });
 
 const propertyConnector = connect(mapStateToProps, mapDispatchToProps);
 type PropertyConnectedProps = ConnectedProps<typeof propertyConnector>
-function Property({authorizationStatus, authInfo, activeCity, onLogout}: PropertyConnectedProps): JSX.Element {
+function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavoriteStatusChange}: PropertyConnectedProps): JSX.Element {
   const { id } = useParams<{id?: string}>();
   const history = useHistory();
   const [offer, setOffer] = useState<TCityPlaceCard | null>(null);
@@ -46,15 +50,53 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
   const [reviews, setReviews] = useState<TReview[] | null>(null);
   const [reviewsLoadError, setLoadReviewsError] = useState<string>('');
   const [sendCommentError, setSendCommentError] = useState<string>('');
+  const [changeIsFavoriteError, setChangeFavoriteError] = useState<string>('');
+  const closeErrorModal = () => {
+    setChangeFavoriteError('');
+  };
+  const onChangeFavoriteError = () => {
+    setChangeFavoriteError('Error while favorite status change');
+  };
   const handleRatingChange = useCallback((rate: number) => {
     setRating(rate);
   }, []);
   const handleCommentTextChange = useCallback((text) => {
     setReviewText(text);
   }, []);
-  const onLoadOfferError = () => {
-    history.push(AppRoutes.NotFound);
+  const handleFavoriteClick = useCallback((offerId: number, isFavorite: boolean) => {
+    onFavoriteStatusChange(offerId, isFavorite).then(() => {
+      if (id && authorizationStatus === AuthStatuses.Auth) {
+        getOffersNeaby(id)
+          .then(onLoadNearbyOffersSuccess)
+          .catch(onLoadNearbyOffersError);
+      } else {
+        history.push(AppRoutes.SignIn);
+      }
+    });
+  }, [id, authorizationStatus, history, onFavoriteStatusChange]);
+  const handlePropertyButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (id && offer && authorizationStatus === AuthStatuses.Auth) {
+      onFavoriteStatusChange(+id, offer.isFavorite)
+        .then(() => {
+          setOffer((prevOffer) => {
+            if (prevOffer) {
+              return {
+                ...prevOffer,
+                isFavorite: !prevOffer.isFavorite,
+              };
+            }
+            return null;
+          });
+        })
+        .catch(onChangeFavoriteError);
+    } else {
+      history.push(AppRoutes.SignIn);
+    }
   };
+  const onLoadOfferError = useCallback(() => {
+    history.push(AppRoutes.NotFound);
+  }, [history]);
   const onLoadNearbyOffersSuccess = (offersNearbyRes: TCityPlaceCard[]) => {
     setLoafOffersNearbyError('');
     setOffersNearby(offersNearbyRes);
@@ -101,7 +143,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
         .then(onLoadNearbyOffersSuccess)
         .catch(onLoadNearbyOffersError);
     }
-  }, [id]);
+  }, [id, onLoadOfferError]);
   useEffect(() => {
     if (id) {
       getReviewsByOfferId(id)
@@ -153,12 +195,12 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
                   {authorizationStatus === AuthStatuses.Auth ?
                     <>
                       <li className="header__nav-item user">
-                        <a className="header__nav-link header__nav-link--profile" href="#">
+                        <Link className="header__nav-link header__nav-link--profile" to={AppRoutes.Favorites}>
                           <div className="header__avatar-wrapper user__avatar-wrapper">
                             <img src={authInfo?.avatarUrl} alt="User Avatar" />
                           </div>
                           <span className="header__user-name user__name">{authInfo?.email}</span>
-                        </a>
+                        </Link>
                       </li>
                       <li className="header__nav-item">
                         <a className="header__nav-link" href="#" onClick={handleLogoutClick}>
@@ -199,7 +241,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
                   <h1 className="property__name">
                     {offer.title}
                   </h1>
-                  <button className={`property__bookmark-button button ${offer.isFavorite ? 'property__bookmark-button--active' : ''}`} type="button">
+                  <button className={`property__bookmark-button button ${offer.isFavorite ? 'property__bookmark-button--active' : ''}`} type="button" onClick={handlePropertyButtonClick}>
                     <svg className="property__bookmark-icon" width={31} height={33}>
                       <use xlinkHref="#icon-bookmark" />
                     </svg>
@@ -278,10 +320,11 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout}: Propert
           <div className="container">
             <section className="near-places places">
               <h2 className="near-places__title">Other places in the neighbourhood</h2>
-              {offersNearby ?  <CardPlaceList offers={offersNearby} classNames={classNamesByPage} /> : <p className="load-error">{loadOffersNearbyError}</p>}
+              {offersNearby ?  <CardPlaceList offers={offersNearby} classNames={classNamesByPage} handleFavoriteClick={handleFavoriteClick}/> : <p className="load-error">{loadOffersNearbyError}</p>}
             </section>
           </div>
         </main>
+        <ErrorModal modalErrorText={changeIsFavoriteError} onCloseModal={closeErrorModal}/>
       </div>
     </>
   );

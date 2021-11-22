@@ -1,3 +1,4 @@
+import { MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import TCityPlaceCard from '../../types/city-place-card';
 type TCardPlaceProps = {
@@ -6,16 +7,21 @@ type TCardPlaceProps = {
   cardClassName: string,
   onPointerOverCard?: (card: TCityPlaceCard) => void,
   onPointerLeaveCard?: () => void,
+  onFavoriteClick: (offerId: number, isFavorite: boolean) => void,
 };
 
-function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, onPointerLeaveCard}: TCardPlaceProps): JSX.Element {
+function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, onPointerLeaveCard, onFavoriteClick}: TCardPlaceProps): JSX.Element {
+  const {id, type ,title, price, rating, isPremiun, isFavorite} = card;
   const handlePointerOver = (): void => {
     onPointerOverCard?.(card);
   };
   const handlePointerLeave = (): void => {
     onPointerLeaveCard?.();
   };
-  const {id, type ,title, price, rating, isPremiun, isFavorite} = card;
+  const handleFavoriteClick = (e: MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    onFavoriteClick(id, isFavorite);
+  };
   return (
     <article className={`${cardClassName} place-card`}
       onPointerOver={handlePointerOver}
@@ -23,9 +29,7 @@ function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, on
     >
       {isPremiun ? <div className="place-card__mark"><span>Premium</span></div> : ''}
       <div className={`${imgWrapClassName} place-card__image-wrapper`}>
-        <a href="#">
-          <img className="place-card__image" src={card.previewImage} width="260" height="200" alt="Place image"/>
-        </a>
+        <img className="place-card__image" src={card.previewImage} width="260" height="200" alt="Place image"/>
       </div>
       <div className="place-card__info">
         <div className="place-card__price-wrapper">
@@ -33,7 +37,11 @@ function CardPlace({card, imgWrapClassName, cardClassName, onPointerOverCard, on
             <b className="place-card__price-value">&euro;{price}</b>
             <span className="place-card__price-text">&#47;&nbsp;night</span>
           </div>
-          <button className={`place-card__bookmark-button button ${isFavorite ? 'place-card__bookmark-button--active': ''}`} type="button">
+          <button
+            className={`place-card__bookmark-button button ${isFavorite ? 'place-card__bookmark-button--active': ''}`}
+            type="button"
+            onClick={handleFavoriteClick}
+          >
             <svg className="place-card__bookmark-icon" width="18" height="19">
               <use xlinkHref="#icon-bookmark"></use>
             </svg>
