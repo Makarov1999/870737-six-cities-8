@@ -110,18 +110,18 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
               <section className="favorites">
                 <h1 className="favorites__title">Saved listing</h1>
                 <ul className="favorites__list">
-                  {favoriteState.mappedFavoriteOffers.map((cityAndOffers) =>
+                  {favoriteState.mappedFavoriteOffers.map(([city, offers]) =>
                     (
-                      <li className="favorites__locations-items" key={cityAndOffers[0]}>
+                      <li className="favorites__locations-items" key={city}>
                         <div className="favorites__locations locations locations--current">
                           <div className="locations__item">
                             <a className="locations__item-link" href="#">
-                              <span>{cityAndOffers[0]}</span>
+                              <span>{city}</span>
                             </a>
                           </div>
                         </div>
                         <div className="favorites__places">
-                          {cityAndOffers[1]
+                          {offers
                             .map((favoriteOffer) => (
                               <article className="favorites__card place-card" key={favoriteOffer.id}>
                                 <div className="favorites__image-wrapper place-card__image-wrapper">
