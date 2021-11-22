@@ -1,7 +1,7 @@
 import Logo from '../logo/logo';
 import CommentForm from '../comment-form/comment-form';
 import ReviewList from '../review-list/review-list';
-import { AuthStatuses, ERROR_FAVORITE_STATUS_CHANGE } from '../../global.constants';
+import { AuthStatuses } from '../../global.constants';
 import Map from '../map/map';
 import CardPlaceList from '../card-place-list/card-place-list';
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react';
@@ -55,7 +55,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
     setChangeFavoriteError('');
   };
   const onChangeFavoriteError = () => {
-    setChangeFavoriteError(ERROR_FAVORITE_STATUS_CHANGE);
+    setChangeFavoriteError('Error while favorite status change');
   };
   const handleRatingChange = useCallback((rate: number) => {
     setRating(rate);
@@ -73,7 +73,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
         history.push(AppRoutes.SignIn);
       }
     });
-  }, []);
+  }, [id, authorizationStatus, history, onFavoriteStatusChange]);
   const handlePropertyButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (id && offer && authorizationStatus === AuthStatuses.Auth) {
@@ -94,9 +94,9 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
       history.push(AppRoutes.SignIn);
     }
   };
-  const onLoadOfferError = () => {
+  const onLoadOfferError = useCallback(() => {
     history.push(AppRoutes.NotFound);
-  };
+  }, [history]);
   const onLoadNearbyOffersSuccess = (offersNearbyRes: TCityPlaceCard[]) => {
     setLoafOffersNearbyError('');
     setOffersNearby(offersNearbyRes);
@@ -143,7 +143,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
         .then(onLoadNearbyOffersSuccess)
         .catch(onLoadNearbyOffersError);
     }
-  }, [id]);
+  }, [id, onLoadOfferError]);
   useEffect(() => {
     if (id) {
       getReviewsByOfferId(id)

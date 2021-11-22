@@ -1,7 +1,7 @@
 import { connect, ConnectedProps } from 'react-redux';
 import Logo from '../logo/logo';
 import { TRootState } from '../../store/reducer';
-import { Dispatch, useEffect, useState } from 'react';
+import { Dispatch, useEffect, useReducer, useState } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
 import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
 import { Link } from 'react-router-dom';
@@ -9,11 +9,9 @@ import { AppRoutes } from '../app/app.constants';
 import TCityPlaceCard from '../../types/city-place-card';
 import Spinner from '../spinner/spinner';
 import { getFavoriteOffers } from '../../services/favorite/favorite';
-import { CITIES_NAMES } from '../../global.constants';
-import { MouseEvent } from 'react';
 import ErrorModal from '../error-modal/error-modal';
-import { ERROR_LOGOUT } from '../../global.constants';
-import { FavoritePageErrors } from './favorite.constants';
+import { favoriteInitialState } from './favorite.constants';
+import { favoriteReducer, fillFavorites, removeFavorite } from './favorite.utils';
 
 
 const mapStateToProps = ({ user }: TRootState) => ({
@@ -34,14 +32,17 @@ type TFavoriteConnectedProps = ConnectedProps<typeof favoriteConnector>;
 
 
 function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConnectedProps): JSX.Element {
-  const [favoriteOffers, setFavoriteOffers] = useState<TCityPlaceCard[] | null>();
   const [errorModalText, setErrorModalText] = useState<string>('');
+  const [favoriteState, favoriteDispatch] = useReducer(favoriteReducer, favoriteInitialState);
   const onLoadFavoriteOffersError = () => {
-    setErrorModalText(FavoritePageErrors.LoadFavoriteOffers);
+    setErrorModalText('Error loading favorite offers');
+  };
+  const onLoadFavoriteOffersSuccess = (favoriteOffers: TCityPlaceCard[]) => {
+    favoriteDispatch(fillFavorites(favoriteOffers));
   };
   useEffect(() =>{
     getFavoriteOffers()
-      .then(setFavoriteOffers)
+      .then(onLoadFavoriteOffersSuccess)
       .catch(onLoadFavoriteOffersError);
 
   }, []);
@@ -52,14 +53,13 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
     setErrorModalText('');
   };
   const onLogoutError = () => {
-    setErrorModalText(ERROR_LOGOUT);
+    setErrorModalText('Error while logout action');
   };
   const onRemoveOfferFromFavoritesError = () => {
-    setErrorModalText(FavoritePageErrors.RemoveFromFavorite);
+    setErrorModalText('Error to change offer favorite status');
   };
   const removeOfferFromFavorite = (offerId: number) => {
-    const newFavoriteOffers = favoriteOffers?.filter((favoriteOffer) => favoriteOffer.id !== offerId);
-    setFavoriteOffers(newFavoriteOffers);
+    favoriteDispatch(removeFavorite(offerId));
   };
   const handleOfferFavoriteStatusChange = (offerId: number, isFavorite: boolean) => {
     onFavoriteStatusChange(offerId, isFavorite)
@@ -68,7 +68,7 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
       })
       .catch(onRemoveOfferFromFavoritesError);
   };
-  if (!favoriteOffers) {
+  if (!favoriteState.isFavoriteOffersLoaded) {
     return <Spinner/>;
   }
   return (
@@ -76,7 +76,7 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
       <div style={{display: 'none'}}>
         <svg xmlns="http://www.w3.org/2000/svg"><symbol id="icon-arrow-select" viewBox="0 0 7 4"><path fillRule="evenodd" clipRule="evenodd" d="M0 0l3.5 2.813L7 0v1.084L3.5 4 0 1.084V0z" /></symbol><symbol id="icon-bookmark" viewBox="0 0 17 18"><path d="M3.993 2.185l.017-.092V2c0-.554.449-1 .99-1h10c.522 0 .957.41.997.923l-2.736 14.59-4.814-2.407-.39-.195-.408.153L1.31 16.44 3.993 2.185z" /></symbol><symbol id="icon-star" viewBox="0 0 13 12"><path fillRule="evenodd" clipRule="evenodd" d="M6.5 9.644L10.517 12 9.451 7.56 13 4.573l-4.674-.386L6.5 0 4.673 4.187 0 4.573 3.549 7.56 2.483 12 6.5 9.644z" /></symbol></svg>
       </div>
-      <div className={`page ${favoriteOffers.length > 0 ? '' : 'page--favorites-empty'}`}>
+      <div className={`page ${favoriteState.mappedFavoriteOffers.length > 0 ? '' : 'page--favorites-empty'}`}>
         <header className="header">
           <div className="container">
             <div className="header__wrapper">
@@ -94,7 +94,7 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
                     </Link>
                   </li>
                   <li className="header__nav-item">
-                    <a className="header__nav-link" href="#" onClick={handleLogoutClick}>
+                    <a className="header__nav-link" href="" onClick={handleLogoutClick}>
                       <span className="header__signout">Sign out</span>
                     </a>
                   </li>
@@ -103,27 +103,26 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
             </div>
           </div>
         </header>
-        <main className={`page__main page__main--favorites ${favoriteOffers.length > 0 ? '' : 'page__main--favorites-empty'}`}>
+        <main className={`page__main page__main--favorites ${favoriteState.mappedFavoriteOffers.length > 0 ? '' : 'page__main--favorites-empty'}`}>
           <div className="page__favorites-container container">
-            {favoriteOffers?.length > 0
+            {favoriteState.mappedFavoriteOffers.length > 0
               ?
               <section className="favorites">
                 <h1 className="favorites__title">Saved listing</h1>
                 <ul className="favorites__list">
-                  {CITIES_NAMES.map((cityName) => {
-                    if (favoriteOffers.some((favoriteOffer) => favoriteOffer.city.name === cityName)) {
-                      return(
-                        <li className="favorites__locations-items">
+                  {favoriteState.mappedFavoriteOffers.map((cityAndOffers) =>
+                    cityAndOffers[1].length > 0 ?
+                      (
+                        <li className="favorites__locations-items" key={cityAndOffers[0]}>
                           <div className="favorites__locations locations locations--current">
                             <div className="locations__item">
                               <a className="locations__item-link" href="#">
-                                <span>{cityName}</span>
+                                <span>{cityAndOffers[0]}</span>
                               </a>
                             </div>
                           </div>
                           <div className="favorites__places">
-                            {favoriteOffers
-                              .filter((favoriteOffer) => favoriteOffer.city.name === cityName)
+                            {cityAndOffers[1]
                               .map((favoriteOffer) => (
                                 <article className="favorites__card place-card" key={favoriteOffer.id}>
                                   <div className="favorites__image-wrapper place-card__image-wrapper">
@@ -140,7 +139,7 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
                                       <button
                                         className="place-card__bookmark-button place-card__bookmark-button--active button"
                                         type="button"
-                                        onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                                        onClick={() => {
                                           handleOfferFavoriteStatusChange(favoriteOffer.id, favoriteOffer.isFavorite);
                                         }}
                                       >
@@ -167,11 +166,8 @@ function Favorite({ authInfo, onLogout, onFavoriteStatusChange }: TFavoriteConne
                               ))}
                           </div>
                         </li>
-                      );
-                    } else {
-                      return '';
-                    }
-                  })}
+                      ): '',
+                  )}
                 </ul>
               </section>
               :

@@ -1,4 +1,13 @@
-export enum FavoritePageErrors {
-  LoadFavoriteOffers = 'Error loading favorite offers',
-  RemoveFromFavorite = 'Error to change offer favorite status',
+import { TFavoriteState } from './favorite.types';
+
+export enum FavoriteActionTypes  {
+  FillFavorites = 'favoriteOffers/fill',
+  RemoveFavorite = 'favoriteOffers/remove',
 }
+
+export const favoriteInitialState: TFavoriteState = {
+  favoriteOffers: [],
+  mappedFavoriteOffers: [],
+  isFavoriteOffersLoaded: false,
+};
+

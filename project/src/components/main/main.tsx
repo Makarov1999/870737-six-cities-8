@@ -12,7 +12,7 @@ import SortList from '../sort-list/sort-list';
 import { TCity } from '../../types/city';
 import TSortType from '../../types/sort-type';
 import { TRootState } from '../../store/reducer';
-import { AuthStatuses, ERROR_FAVORITE_STATUS_CHANGE, ERROR_LOGOUT } from '../../global.constants';
+import { AuthStatuses } from '../../global.constants';
 import { Link, useHistory } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
 import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
@@ -55,13 +55,13 @@ function Main({
   const [errorText, setErrorText] = useState<string>('');
   const history = useHistory();
   const onLogoutError = () => {
-    setErrorText(ERROR_LOGOUT);
+    setErrorText('Error while logout action');
   };
   const closeErrorModal = () => {
     setErrorText('');
   };
   const onFavoriteStatusChangeError = () => {
-    setErrorText(ERROR_FAVORITE_STATUS_CHANGE);
+    setErrorText('Error while favorite status change');
   };
   const classNamesByPage = useMemo(() => ({
     list: 'cities__places-list tabs__content',
@@ -81,7 +81,7 @@ function Main({
       history.push(AppRoutes.SignIn);
     }
 
-  }, []);
+  }, [authorizationStatus, history, onFavoriteStatusChange]);
   const handleLogoutClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     onLogout().catch(() => {
