@@ -17,10 +17,14 @@ const mapFavoriteOffers = (favoriteOffers: TCityPlaceCard[]): Array<[string, TCi
   if(!favoriteOffers.length) {
     return [];
   }
-  return CITIES_NAMES.map((cityName) => {
-    const filtered = favoriteOffers.filter((offer) => offer.city.name === cityName);
-    return [cityName, filtered];
-  });
+  const mappedFavoriteOffers: Array<[string, TCityPlaceCard[]]> = [];
+  for (const cityName of CITIES_NAMES) {
+    const filteredOffers = favoriteOffers.filter((offer) => offer.city.name === cityName);
+    if (filteredOffers.length > 0) {
+      mappedFavoriteOffers.push([cityName, filteredOffers]);
+    }
+  }
+  return mappedFavoriteOffers;
 };
 
 export const favoriteReducer = (state: TFavoriteState, action: TFavoriteActions): TFavoriteState => {
