@@ -1,12 +1,10 @@
 import CardPlaceList from '../card-place-list/card-place-list';
 import TCityPlaceCard from '../../types/city-place-card';
 import {useCallback, useMemo, useState, MouseEvent } from 'react';
-import { Dispatch } from 'redux';
 import Map from '../map/map';
 import MainEmpty from '../main-empty/main-empty';
 import CityList from '../city-list/city-list';
 import { connect, ConnectedProps } from 'react-redux';
-import { TActions, TThunkActionDispatch } from '../../types/action';
 import { changeCity, sortByType } from '../../store/offers-reducer/actions';
 import SortList from '../sort-list/sort-list';
 import { TCity } from '../../types/city';
@@ -19,6 +17,7 @@ import { changeFavoriteStatusFromOffer } from '../../store/offers-reducer/api-ac
 import { logoutAction } from '../../store/user-reducer/api-actions';
 import { getOffersResult } from '../../store/selectors/offer-selector';
 import ErrorModal from '../error-modal/error-modal';
+import { TAppDispatch } from '../../types/app-dispatch';
 
 const mapStateToProps = ({offers, user}: TRootState) => ({
   activeCity: offers.activeCity,
@@ -26,7 +25,7 @@ const mapStateToProps = ({offers, user}: TRootState) => ({
   authorizationStatus: user.authorizationStatus,
   authInfo: user.authInfo,
 });
-const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+const mapDispatchToProps = (dispatch: TAppDispatch) => ({
   onCityChange(city: TCity) {
     dispatch(changeCity(city));
   },
@@ -34,10 +33,10 @@ const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
     dispatch(sortByType(sortType));
   },
   onLogout() {
-    return (dispatch as TThunkActionDispatch)(logoutAction());
+    return dispatch(logoutAction());
   },
   onFavoriteStatusChange(offerId: number, isFavorite: boolean) {
-    return (dispatch as TThunkActionDispatch)(changeFavoriteStatusFromOffer(offerId, isFavorite));
+    return dispatch(changeFavoriteStatusFromOffer(offerId, isFavorite));
   },
 });
 const mainConnector = connect(mapStateToProps, mapDispatchToProps);

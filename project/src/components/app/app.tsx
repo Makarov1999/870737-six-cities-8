@@ -8,24 +8,24 @@ import { AppRoutes } from './app.constants';
 import PrivateRoute from '../private-route/private-route';
 import { connect, ConnectedProps } from 'react-redux';
 import Spinner from '../spinner/spinner';
-import { Dispatch, useEffect, useState } from 'react';
-import { TActions, TThunkActionDispatch } from '../../types/action';
+import { useEffect, useState } from 'react';
 import { fetchOffersAction } from '../../store/offers-reducer/api-actions';
 import { checkUserAuth } from '../../store/user-reducer/api-actions';
 import { TRootState } from '../../store/reducer';
 import './app.css';
+import { TAppDispatch } from '../../types/app-dispatch';
 
 
 const mapStateToProps = ({ offers, user }: TRootState) => ({
   isDataLoaded: offers.isDataLoaded,
   authorizationStatus: user.authorizationStatus,
 });
-const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+const mapDispatchToProps = (dispatch: TAppDispatch) => ({
   loadOffers() {
-    return (dispatch as TThunkActionDispatch)(fetchOffersAction());
+    return dispatch(fetchOffersAction());
   },
   checkAuthorization() {
-    return (dispatch as TThunkActionDispatch)(checkUserAuth());
+    return dispatch(checkUserAuth());
   },
 });
 const appConnector = connect(mapStateToProps, mapDispatchToProps);

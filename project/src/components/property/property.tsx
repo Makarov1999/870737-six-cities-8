@@ -4,12 +4,11 @@ import ReviewList from '../review-list/review-list';
 import { AuthStatuses } from '../../constants';
 import Map from '../map/map';
 import CardPlaceList from '../card-place-list/card-place-list';
-import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { TRootState } from '../../store/reducer';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
-import { TActions, TThunkActionDispatch } from '../../types/action';
 import { changeFavoriteStatusFromOffer } from '../../store/offers-reducer/api-actions';
 import {  logoutAction } from '../../store/user-reducer/api-actions';
 import { MouseEvent } from 'react';
@@ -21,6 +20,7 @@ import { TReview } from '../../types/review';
 import { getReviewsByOfferId, sendCommentByOfferId } from '../../services/review/review';
 import './property.css';
 import ErrorModal from '../error-modal/error-modal';
+import { TAppDispatch } from '../../types/app-dispatch';
 
 const mapStateToProps = ({offers, user}: TRootState) => ({
   authorizationStatus: user.authorizationStatus,
@@ -28,12 +28,12 @@ const mapStateToProps = ({offers, user}: TRootState) => ({
   activeCity: offers.activeCity,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+const mapDispatchToProps = (dispatch: TAppDispatch) => ({
   onLogout() {
-    return (dispatch as TThunkActionDispatch)(logoutAction());
+    return dispatch(logoutAction());
   },
   onFavoriteStatusChange(offerId: number, isFavorite: boolean) {
-    return (dispatch as TThunkActionDispatch)(changeFavoriteStatusFromOffer(offerId, isFavorite));
+    return dispatch(changeFavoriteStatusFromOffer(offerId, isFavorite));
   },
 });
 

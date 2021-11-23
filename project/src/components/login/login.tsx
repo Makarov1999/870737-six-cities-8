@@ -1,8 +1,7 @@
 import Logo from '../logo/logo';
 import {connect, ConnectedProps} from 'react-redux';
 import { TRootState } from '../../store/reducer';
-import { ChangeEvent, Dispatch, FormEvent, useEffect, useState } from 'react';
-import { TActions, TThunkActionDispatch} from '../../types/action';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { TAuthData } from '../../types/auth-data';
 import { loginAction } from '../../store/user-reducer/api-actions';
 import { AuthStatuses } from '../../constants';
@@ -10,28 +9,29 @@ import { useHistory } from 'react-router';
 import { AppRoutes } from '../app/app.constants';
 import './login.css';
 import { PASSWORD_PATTERN } from './login.constants';
+import { TAppDispatch } from '../../types/app-dispatch';
 
 const mapStateToProps = ({ user }: TRootState) => ({
   authorizationStatus: user.authorizationStatus,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+const mapDispatchToProps = (dispatch: TAppDispatch) => ({
   onLoginFormSubmit(authData: TAuthData) {
-    return (dispatch as TThunkActionDispatch)(loginAction(authData));
+    return dispatch(loginAction(authData));
   },
 });
 const loginConnector = connect(mapStateToProps, mapDispatchToProps);
 type TLoginConnectedProps = ConnectedProps<typeof loginConnector>;
 
 function Login({authorizationStatus, onLoginFormSubmit}: TLoginConnectedProps): JSX.Element {
+  const history = useHistory();
   useEffect(() => {
     if (authorizationStatus === AuthStatuses.Auth) {
       history.push(AppRoutes.Main);
     }
-  },[authorizationStatus]);
+  },[authorizationStatus, history]);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState('');
-  const history = useHistory();
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };

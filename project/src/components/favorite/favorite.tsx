@@ -1,8 +1,7 @@
 import { connect, ConnectedProps } from 'react-redux';
 import Logo from '../logo/logo';
 import { TRootState } from '../../store/reducer';
-import { Dispatch, useEffect, useReducer, useState } from 'react';
-import { TActions, TThunkActionDispatch } from '../../types/action';
+import { useEffect, useReducer, useState } from 'react';
 import { changeFavoriteStatusFromOffer } from '../../store/offers-reducer/api-actions';
 import { logoutAction } from '../../store/user-reducer/api-actions';
 import { Link } from 'react-router-dom';
@@ -13,18 +12,19 @@ import { getFavoriteOffers } from '../../services/favorite/favorite';
 import ErrorModal from '../error-modal/error-modal';
 import { favoriteInitialState } from './favorite.constants';
 import { favoriteReducer, fillFavorites, removeFavorite } from './favorite.utils';
+import { TAppDispatch } from '../../types/app-dispatch';
 
 
 const mapStateToProps = ({ user }: TRootState) => ({
   authInfo: user.authInfo,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch<TActions>) => ({
+const mapDispatchToProps = (dispatch: TAppDispatch) => ({
   onLogout() {
-    return (dispatch as TThunkActionDispatch)(logoutAction());
+    return dispatch(logoutAction());
   },
   onFavoriteStatusChange(offerId: number, isFavorite: boolean) {
-    return (dispatch as TThunkActionDispatch)(changeFavoriteStatusFromOffer(offerId, isFavorite));
+    return dispatch(changeFavoriteStatusFromOffer(offerId, isFavorite));
   },
 });
 
