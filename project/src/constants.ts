@@ -1,8 +1,7 @@
 import { TCity } from './types/city';
 import TSortType from './types/sort-type';
 
-export const ERROR_LOGOUT = 'Error while logout action';
-export const ERROR_FAVORITE_STATUS_CHANGE = 'Error while favorite status change';
+
 export const DEFAULT_SORT_TYPE: TSortType = 'Popular';
 
 const MONTHS_NAMES: string[] = [
@@ -20,11 +19,8 @@ const MONTHS_NAMES: string[] = [
   'December',
 ];
 
-type TMonthDictionary = {
-  [x: number]: string;
-}
 
-export const MONTHS_DICTIONARY: TMonthDictionary  = {...MONTHS_NAMES};
+export const MONTHS_DICTIONARY: Record<number, string>  = {...MONTHS_NAMES};
 
 export const DEFAULT_CITY = {
   id: 1,
@@ -93,7 +89,7 @@ export const CITIES: TCity[] = [
   },
 ];
 
-export const CITIES_NAMES = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'];
+export const CITIES_NAMES = CITIES.map((city) => city.title);
 
 export enum AuthStatuses {
   Auth = 'AUTH',

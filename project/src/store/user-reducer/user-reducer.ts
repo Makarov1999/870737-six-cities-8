@@ -1,4 +1,4 @@
-import { AuthStatuses } from '../../global.constants';
+import { AuthStatuses } from '../../constants';
 import { ActionType, TActions } from '../../types/action';
 import { TUserState } from '../../types/state';
 

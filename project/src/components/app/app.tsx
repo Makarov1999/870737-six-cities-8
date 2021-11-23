@@ -4,13 +4,14 @@ import Login from '../login/login';
 import Main from '../main/main';
 import NotFound from '../not-found/not-found';
 import Property from '../property/property';
-import { AppRoutes, ERROR_LOAD_TEXT } from './app.constants';
+import { AppRoutes } from './app.constants';
 import PrivateRoute from '../private-route/private-route';
 import { connect, ConnectedProps } from 'react-redux';
 import Spinner from '../spinner/spinner';
 import { Dispatch, useEffect, useState } from 'react';
 import { TActions, TThunkActionDispatch } from '../../types/action';
-import { checkUserAuth, fetchOffersAction } from '../../store/api-actions';
+import { fetchOffersAction } from '../../store/offers-reducer/api-actions';
+import { checkUserAuth } from '../../store/user-reducer/api-actions';
 import { TRootState } from '../../store/reducer';
 import './app.css';
 
@@ -33,19 +34,16 @@ const appConnector = connect(mapStateToProps, mapDispatchToProps);
 function App({isDataLoaded, loadOffers, checkAuthorization, authorizationStatus}: TConnectedAppProps): JSX.Element {
   const [loadError, setErrorLoad] = useState<string>('');
   const history = useHistory();
-  const onLoadOffersError = () => {
-    setErrorLoad(ERROR_LOAD_TEXT);
-  };
   useEffect(() => {
     checkAuthorization().catch(() => {
       history.push(AppRoutes.SignIn);
     });
-  }, [authorizationStatus]);
+  }, [authorizationStatus, checkAuthorization, history]);
   useEffect(() => {
     loadOffers().catch(() => {
-      onLoadOffersError();
+      setErrorLoad('Произошла ошибка при загрузке данных');
     });
-  }, []);
+  }, [loadOffers]);
   if (!isDataLoaded) {
     return(
       <Spinner/>

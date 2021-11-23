@@ -1,5 +1,5 @@
 import { Route, Redirect, RouteProps } from 'react-router-dom';
-import { AuthStatuses } from '../../global.constants';
+import { AuthStatuses } from '../../constants';
 import { AppRoutes } from '../app/app.constants';
 import {connect, ConnectedProps} from 'react-redux';
 import { TRootState } from '../../store/reducer';

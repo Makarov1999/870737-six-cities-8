@@ -1,4 +1,4 @@
-import { AuthStatuses } from '../global.constants';
+import { AuthStatuses } from '../constants';
 import  TAuthInfo  from './auth-info';
 import { TCity } from './city';
 import TCityPlaceCard from './city-place-card';

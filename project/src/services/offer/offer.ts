@@ -9,7 +9,7 @@ export const getOfferById = async (id: string): Promise<TCityPlaceCard> => {
   return adaptToClient<TCityPlaceCardApi, TCityPlaceCard>(data);
 };
 
-export const getOffersNeaby = async (id: string): Promise<TCityPlaceCard[]> => {
+export const getOffersNearby = async (id: string): Promise<TCityPlaceCard[]> => {
   const { data } = await api.get<TCityPlaceCardApi[]>(`${APIRoutes.Offers}/${id}/nearby`);
   const offers = data.map((offer: TCityPlaceCardApi) => adaptToClient<TCityPlaceCardApi, TCityPlaceCard>(offer));
   return offers;

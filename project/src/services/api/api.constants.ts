@@ -1,6 +1,6 @@
 export const BASE_URL = 'https://8.react.pages.academy/six-cities';
 export const REQUEST_TIMEOUT = 5000;
-export enum HttpCode {
+export enum HttpCodes {
   Unauthorized = 401,
 }
 

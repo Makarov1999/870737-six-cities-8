@@ -1,4 +1,4 @@
-import { MONTHS_DICTIONARY } from '../global.constants';
+import { MONTHS_DICTIONARY } from '../constants';
 
 export function dateToDateTimeStr(dateStr: string): string {
   const date = new Date(dateStr);

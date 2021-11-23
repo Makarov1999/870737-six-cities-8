@@ -3,7 +3,7 @@ import { TCity } from './city';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { AxiosInstance } from 'axios';
 import TCityPlaceCard from './city-place-card';
-import { AuthStatuses } from '../global.constants';
+import { AuthStatuses } from '../constants';
 import TAuthInfo from './auth-info';
 import { TRootState } from '../store/reducer';
 

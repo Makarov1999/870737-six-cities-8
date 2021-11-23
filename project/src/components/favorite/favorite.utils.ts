@@ -1,7 +1,7 @@
 import TCityPlaceCard from '../../types/city-place-card';
 import { FavoriteActionTypes } from './favorite.constants';
 import { TFavoriteActions, TFavoriteState, TFillFavoriteOffersAction, TRemoveFavoriteOfferAction } from './favorite.types';
-import { CITIES_NAMES } from '../../global.constants';
+import { CITIES_NAMES } from '../../constants';
 
 export const fillFavorites = (favoriteOffers: TCityPlaceCard[]): TFillFavoriteOffersAction => ({
   type: FavoriteActionTypes.FillFavorites,

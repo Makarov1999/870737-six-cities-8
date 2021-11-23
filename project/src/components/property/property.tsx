@@ -1,7 +1,7 @@
 import Logo from '../logo/logo';
 import CommentForm from '../comment-form/comment-form';
 import ReviewList from '../review-list/review-list';
-import { AuthStatuses } from '../../global.constants';
+import { AuthStatuses } from '../../constants';
 import Map from '../map/map';
 import CardPlaceList from '../card-place-list/card-place-list';
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react';
@@ -10,11 +10,12 @@ import { TRootState } from '../../store/reducer';
 import { Link, Redirect, useHistory, useParams } from 'react-router-dom';
 import { AppRoutes } from '../app/app.constants';
 import { TActions, TThunkActionDispatch } from '../../types/action';
-import { changeFavoriteStatusFromOffer, logoutAction } from '../../store/api-actions';
+import { changeFavoriteStatusFromOffer } from '../../store/offers-reducer/api-actions';
+import {  logoutAction } from '../../store/user-reducer/api-actions';
 import { MouseEvent } from 'react';
 import TCityPlaceCard from '../../types/city-place-card';
 import Spinner from '../spinner/spinner';
-import { getOfferById, getOffersNeaby } from '../../services/offer/offer';
+import { getOfferById, getOffersNearby } from '../../services/offer/offer';
 import { COMMENT_LENGTH_MIN, COMMENT_LENGTH_MAX } from './property.constants';
 import { TReview } from '../../types/review';
 import { getReviewsByOfferId, sendCommentByOfferId } from '../../services/review/review';
@@ -51,12 +52,9 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
   const [reviewsLoadError, setLoadReviewsError] = useState<string>('');
   const [sendCommentError, setSendCommentError] = useState<string>('');
   const [changeIsFavoriteError, setChangeFavoriteError] = useState<string>('');
-  const closeErrorModal = () => {
+  const closeErrorModal = useCallback(() => {
     setChangeFavoriteError('');
-  };
-  const onChangeFavoriteError = () => {
-    setChangeFavoriteError('Error while favorite status change');
-  };
+  }, []);
   const handleRatingChange = useCallback((rate: number) => {
     setRating(rate);
   }, []);
@@ -66,9 +64,9 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
   const handleFavoriteClick = useCallback((offerId: number, isFavorite: boolean) => {
     onFavoriteStatusChange(offerId, isFavorite).then(() => {
       if (id && authorizationStatus === AuthStatuses.Auth) {
-        getOffersNeaby(id)
+        getOffersNearby(id)
           .then(onLoadNearbyOffersSuccess)
-          .catch(onLoadNearbyOffersError);
+          .catch(() => setLoafOffersNearbyError('Error offers nearby loading'));
       } else {
         history.push(AppRoutes.SignIn);
       }
@@ -89,7 +87,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
             return null;
           });
         })
-        .catch(onChangeFavoriteError);
+        .catch(() => setChangeFavoriteError('Error while favorite status change'));
     } else {
       history.push(AppRoutes.SignIn);
     }
@@ -100,9 +98,6 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
   const onLoadNearbyOffersSuccess = (offersNearbyRes: TCityPlaceCard[]) => {
     setLoafOffersNearbyError('');
     setOffersNearby(offersNearbyRes);
-  };
-  const onLoadNearbyOffersError = () => {
-    setLoafOffersNearbyError('Error offers nearby loading');
   };
   const onSuccessSendComment = (reviewsRes: TReview[]) => {
     setRating(undefined);
@@ -115,12 +110,6 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
     const sortReviews = reviewsRes.sort((prevReview, nextReview) => (new Date(nextReview.date).getTime() - new Date(prevReview.date).getTime()));
     setReviews(sortReviews);
   };
-  const onErrorReviewLoading = () => {
-    setLoadReviewsError('Error loading comments');
-  };
-  const onSendCommentError = () => {
-    setSendCommentError('Error on comment sending');
-  };
   const onSubmitCommentForm = () => {
     setSendCommentError('');
     if (id && rating && reviewText) {
@@ -131,7 +120,7 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
           comment: reviewText,
         })
         .then(onSuccessSendComment)
-        .catch(onSendCommentError);
+        .catch(() => setSendCommentError('Error on comment sending'));
     }
   };
   useEffect(() => {
@@ -139,16 +128,16 @@ function Property({authorizationStatus, authInfo, activeCity, onLogout, onFavori
       getOfferById(id)
         .then(setOffer)
         .catch(onLoadOfferError);
-      getOffersNeaby(id)
+      getOffersNearby(id)
         .then(onLoadNearbyOffersSuccess)
-        .catch(onLoadNearbyOffersError);
+        .catch(() => setLoafOffersNearbyError('Error offers nearby loading'));
     }
   }, [id, onLoadOfferError]);
   useEffect(() => {
     if (id) {
       getReviewsByOfferId(id)
         .then(onSuccessReviewLoading)
-        .catch(onErrorReviewLoading);
+        .catch(() => setLoadReviewsError('Error loading comments'));
     }
   }, [id]);
   useEffect(() => {

@@ -1,6 +1,5 @@
 import CityListItem from '../city-list-item/city-list-item';
-//import { CITIES } from './city-list.constants';
-import { CITIES } from '../../global.constants';
+import { CITIES } from '../../constants';
 import { TCity } from '../../types/city';
 type TCityListProps = {
   activeCity: string;

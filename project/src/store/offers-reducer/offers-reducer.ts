@@ -1,6 +1,6 @@
 import { ActionType, TActions } from '../../types/action';
 import { TOffersState } from '../../types/state';
-import { CITIES, DEFAULT_CITY, DEFAULT_SORT_TYPE } from '../../global.constants';
+import { CITIES, DEFAULT_CITY, DEFAULT_SORT_TYPE } from '../../constants';
 
 const initialState = {
   offers: [],
